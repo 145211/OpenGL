@@ -19,6 +19,18 @@
 #include <iostream>
 
 float aspectRatio = 1;
+float speed_x = 1, speed_y = 1;
+float sensitivity = 0.1;
+double cursorxpos = 0, cursorypos = 0;
+bool firstMouse = true;
+
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
 
 ShaderProgram* sp;
 
@@ -37,6 +49,41 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
+//Mouse handling
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+	if (firstMouse)
+	{
+		//int width, height;
+		//glfwGetWindowSize(window, &width, &height);
+		cursorxpos = xpos;
+		cursorypos = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - cursorxpos;
+	float yoffset = cursorypos - ypos; // reversed since y-coordinates go from bottom to top
+	cursorxpos = xpos;
+	cursorypos = ypos;
+
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
+}
+
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	if (height == 0) return;
 	aspectRatio = (float)width / (float)height;
@@ -50,6 +97,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glEnable(GL_DEPTH_TEST);
 	glfwSetWindowSizeCallback(window, windowResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 }
@@ -61,13 +111,35 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
+float verts[] = {
+	0, 4.08, 0, 1,
+	0, 0, 2.88, 1,
+	-2.5, 0, -1.44, 1,
+	2.5, 0, -1.44, 1
+};
+
+float colors[] = {
+	1, 0, 0, 1,
+	0, 1, 0, 1,
+	0, 0, 1, 1,
+	1, 1, 0, 1
+};
+
+unsigned int indexes[] = {
+	0, 1, 2,
+	0, 1, 3
+};
+
+int indexCount = 12, vertexCount = 4;
+
+
 void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 	//************Tutaj umieszczaj kod rysujący obraz******************l
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 V = glm::lookAt(
-		glm::vec3(0, 0, -2.5),
-		glm::vec3(0, 0, 0),
+		glm::vec3(0, 3, -9),
+		glm::vec3(0, 3, -9) + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
@@ -82,7 +154,17 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 
-	// ...
+	glEnableVertexAttribArray(sp->a("vertex"));
+	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, verts);
+
+	glEnableVertexAttribArray(sp->a("color"));
+	glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, colors);
+
+	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
+	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+
+	glDisableVertexAttribArray(sp->a("color"));
+	glDisableVertexAttribArray(sp->a("vertex"));
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
@@ -124,8 +206,9 @@ int main(void)
 	glfwSetTime(0); //Zeruj timer
 	while (!glfwWindowShouldClose(window)) //Tak długo jak okno nie powinno zostać zamknięte
 	{
-		angle_x += glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
-		angle_y += glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
+
+		angle_x += speed_x * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
+		angle_y += speed_y * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		glfwSetTime(0); //Zeruj timer
 		drawScene(window, angle_x, angle_y); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.

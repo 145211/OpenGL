@@ -214,7 +214,7 @@ void ShaderProgram::setMat3fv(glm::mat3 value, const GLchar* name, GLboolean tra
 	this->unuse();
 }
 
-void ShaderProgram::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE)
+void ShaderProgram::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose)
 {
 	this->use();
 
