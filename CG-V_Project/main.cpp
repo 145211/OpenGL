@@ -1,7 +1,6 @@
 ﻿#define GLM_FORCE_RADIANS
 #define GLM_FORCE_SWIZZLE
 
-// test
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -11,6 +10,9 @@
 
 #include "shaderprogram.h"
 #include "constants.h"
+#include "Texture.h"
+#include "Vertex.h"
+#include "Model.h"
 
 #include <stdlib.h>
 #include <stdio.h>

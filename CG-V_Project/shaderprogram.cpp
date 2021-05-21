@@ -151,3 +151,75 @@ GLuint ShaderProgram::u(const char* variableName) {
 GLuint ShaderProgram::a(const char* variableName) {
 	return glGetAttribLocation(shaderProgram,variableName);
 }
+
+void ShaderProgram::unuse()
+{
+	glUseProgram(0);
+}
+
+void ShaderProgram::set1i(GLint value, const GLchar* name)
+{
+	this->use();
+
+	glUniform1i(this->u(name), value);
+
+	this->unuse();
+}
+
+void ShaderProgram::set1f(GLfloat value, const GLchar* name)
+{
+	this->use();
+
+	//glUniform1f(glGetUniformLocation(this->shaderProgram, name), value);
+	glUniform1f(this->u(name), value);
+
+	this->unuse();
+}
+
+void ShaderProgram::setVec2f(glm::fvec2 value, const GLchar* name)
+{
+	this->use();
+
+	//glUniform2fv(glGetUniformLocation(this->shaderProgram, name), 1, glm::value_ptr(value));
+	glUniform2fv(this->u(name), 1, glm::value_ptr(value));
+
+	this->unuse();
+}
+
+void ShaderProgram::setVec3f(glm::fvec3 value, const GLchar* name)
+{
+	this->use();
+
+	//glUniform3fv(glGetUniformLocation(this->shaderProgram, name), 1, glm::value_ptr(value));
+	glUniform3fv(this->u(name), 1, glm::value_ptr(value));
+
+	this->unuse();
+}
+
+void ShaderProgram::setVec4f(glm::fvec4 value, const GLchar* name)
+{
+	this->use();
+
+	glUniform4fv(this->u(name), 1, glm::value_ptr(value));
+
+	this->unuse();
+}
+
+void ShaderProgram::setMat3fv(glm::mat3 value, const GLchar* name, GLboolean transpose)
+{
+	this->use();
+
+	glUniformMatrix3fv(this->u(name), 1, transpose, glm::value_ptr(value));
+
+	this->unuse();
+}
+
+void ShaderProgram::setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE)
+{
+	this->use();
+
+	glUniformMatrix4fv(this->u(name), 1, transpose, glm::value_ptr(value));
+
+	this->unuse();
+}
+
