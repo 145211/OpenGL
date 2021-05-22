@@ -10,5 +10,6 @@
 - [ ] Podstawowy render importowanych modeli
 - [ ] Bajery w renderowaniu
 - [ ] Uklasowenie wszystkiego co wydaje się sensowne
+- [ ] \(optional) Pochodnia albo latarka
 
 To nie są jeszcze wszystkie punkty(?)
