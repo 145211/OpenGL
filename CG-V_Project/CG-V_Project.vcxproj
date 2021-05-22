@@ -151,6 +151,7 @@
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="shaderprogram.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -159,7 +160,9 @@
     <ClInclude Include="constants.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="myCube.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />

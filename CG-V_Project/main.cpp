@@ -13,10 +13,14 @@
 #include "Texture.h"
 #include "Vertex.h"
 #include "Model.h"
+#include "Mesh.h"
+#include "Vertex.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+
+#include "myCube.h"
 
 float aspectRatio = 1;
 float speed_x = 1, speed_y = 1;
@@ -98,7 +102,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetWindowSizeCallback(window, windowResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
@@ -111,35 +115,14 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
-float verts[] = {
-	0, 4.08, 0, 1,
-	0, 0, 2.88, 1,
-	-2.5, 0, -1.44, 1,
-	2.5, 0, -1.44, 1
-};
-
-float colors[] = {
-	1, 0, 0, 1,
-	0, 1, 0, 1,
-	0, 0, 1, 1,
-	1, 1, 0, 1
-};
-
-unsigned int indexes[] = {
-	0, 1, 2,
-	0, 1, 3
-};
-
-int indexCount = 12, vertexCount = 4;
-
 
 void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
-	//************Tutaj umieszczaj kod rysujący obraz******************l
+	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 V = glm::lookAt(
-		glm::vec3(0, 3, -9),
-		glm::vec3(0, 3, -9) + cameraFront,
+		glm::vec3(0, 0, -6),
+		glm::vec3(0, 0, -6) + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
@@ -155,14 +138,19 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
 
 	glEnableVertexAttribArray(sp->a("vertex"));
-	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, verts);
+	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, myCubeVertices);
 
 	glEnableVertexAttribArray(sp->a("color"));
-	glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, colors);
+	glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, myCubeColors);
+	
+	glEnableVertexAttribArray(sp->a("normal"));
+	glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, myCubeNormals);
+	//test.setRotation(glm::vec3(angle_y, angle_x, 0));
+	//test.render(sp);
+	//glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
+	glDrawArrays(GL_TRIANGLES, 0, myCubeVertexCount);
 
-	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
-	glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-
+	glDisableVertexAttribArray(sp->a("normal"));
 	glDisableVertexAttribArray(sp->a("color"));
 	glDisableVertexAttribArray(sp->a("vertex"));
 
@@ -199,6 +187,14 @@ int main(void)
 	}
 
 	initOpenGLProgram(window); //Operacje inicjujące
+
+	//Vertex vtest[myCubeVertexCount];
+	//for (int i = 0; i < myCubeVertexCount; ++i) {
+	//	vtest[i].position = glm::vec4(myCubeVertices[4 * i], myCubeVertices[4 * i + 1], myCubeVertices[4 * i + 2], myCubeVertices[4 * i + 3]);
+	//	vtest[i].color = glm::vec4(myCubeColors[4 * i], myCubeColors[4 * i + 1], myCubeColors[4 * i + 2], myCubeColors[4 * i + 3]);
+	//	vtest[i].normal = glm::vec4(myCubeNormals[4 * i], myCubeNormals[4 * i + 1], myCubeNormals[4 * i + 2], myCubeNormals[4 * i + 3]);
+	//}
+	//Mesh test(vtest, myCubeVertexCount, nullptr, NULL);
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
