@@ -163,6 +163,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="myCube.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="OBJLoader.h" />
     <ClInclude Include="shaderprogram.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vertex.h" />

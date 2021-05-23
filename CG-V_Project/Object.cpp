@@ -118,7 +118,6 @@ void Object::render()
 	//sp->use();
 
 	glBindVertexArray(this->VAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDrawArrays(GL_TRIANGLES, 0, this->vertexCount);
 

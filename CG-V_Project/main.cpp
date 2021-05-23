@@ -13,18 +13,20 @@
 #include "Texture.h"
 #include "Vertex.h"
 #include "Model.h"
-#include "Mesh.h"
 #include "Vertex.h"
 #include "Object.h"
+
+#include "OBJLoader.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
 #include "myCube.h"
 
 float aspectRatio = 1;
-float speed_x = 1, speed_y = 1;
+float movementSpeed = 0.3;
 float sensitivity = 0.1;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -33,6 +35,10 @@ bool firstMouse = true;
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+glm::vec3 playerPos = glm::vec3(0.0f);
+glm::vec3 moveVec = glm::vec3(0.0f);
+
 
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
@@ -46,12 +52,19 @@ void error_callback(int error, const char* description) {
 
 //Keyboard handilng
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-
-    }
-    if (action == GLFW_RELEASE) {
-
-    }
+	if (action == GLFW_PRESS) {
+		movementSpeed = 0.3;
+		if (key == GLFW_KEY_LEFT) { moveVec = glm::normalize(glm::cross(cameraFront, cameraUp)) * -movementSpeed; };
+		if (key == GLFW_KEY_RIGHT) moveVec = glm::normalize(glm::cross(cameraFront, cameraUp)) * movementSpeed;
+		if (key == GLFW_KEY_UP) moveVec = cameraFront * movementSpeed;
+		if (key == GLFW_KEY_DOWN) moveVec = -cameraFront * movementSpeed;
+	}
+	if (action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_LEFT) moveVec = glm::vec3(0.0f);
+		if (key == GLFW_KEY_RIGHT) moveVec = glm::vec3(0.0f);
+		if (key == GLFW_KEY_UP) moveVec = glm::vec3(0.0f);
+		if (key == GLFW_KEY_DOWN) moveVec = glm::vec3(0.0f);
+	}
 }
 
 //Mouse handling
@@ -103,9 +116,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetWindowSizeCallback(window, windowResizeCallback);
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 }
 
@@ -128,13 +141,16 @@ Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, f
 	return varr;
 }
 
-void drawScene(GLFWwindow* window, float angle_x, float angle_y, Object& otest) {
+void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Object& otest) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//playerPos += glm::vec3(speed_x, 0, speed_z) * cameraFront;
+	playerPos += moveVec;
+
 	glm::mat4 V = glm::lookAt(
-		glm::vec3(0, 0, -6),
-		glm::vec3(0, 0, -6) + cameraFront,
+		/*glm::vec3(0, 0, -6)*/ playerPos,
+		/*glm::vec3(0, 0, -6)*/ playerPos + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
@@ -143,11 +159,13 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, Object& otest) 
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
 	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
 
-	otest.setRotation(glm::vec3(angle_x, angle_y, 0));
+	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
+
+	//otest.setRotation(glm::vec3(angle_x, angle_y, 0));
 	otest.render();
 
 	//glm::mat4 M = glm::mat4(1.0f);
-	//M = glm::rotate(M, angle_y, glm::vec3(1.0f, 0.0f, 0.0f)); //Wylicz macierz modelu
+	//M = glm::rotate(M, angle_y+0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); //Wylicz macierz modelu
 	//M = glm::rotate(M, angle_x, glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz modelu
 
 	//sp->use();//Aktywacja programu cieniującego
@@ -208,8 +226,10 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
-	Object otest(sp, vtest, (GLuint)myCubeVertexCount);
+	//Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
+	std::vector<Vertex> vtest = loadOBJ("Pantheon_without_cube.obj");
+	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
+	Object otest(sp, vtest.data(), (GLuint)vtest.size());
 
 	GLuint VAO, VBO;
 	glGenBuffers(1, &VAO);
@@ -225,10 +245,10 @@ int main(void)
 	while (!glfwWindowShouldClose(window)) //Tak długo jak okno nie powinno zostać zamknięte
 	{
 
-		angle_x += speed_x * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
-		angle_y += speed_y * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
+		angle_x += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
+		angle_y += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		glfwSetTime(0); //Zeruj timer
-		drawScene(window, angle_x, angle_y, otest); //Wykonaj procedurę rysującą
+		drawScene(window, angle_x, angle_y, playerPos, otest); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
 	}
 
