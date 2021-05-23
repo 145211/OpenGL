@@ -33,7 +33,7 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,10 +59,10 @@
     <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="myCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="myCube.h">
+    <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

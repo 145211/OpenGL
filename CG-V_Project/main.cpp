@@ -15,6 +15,7 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "Vertex.h"
+#include "Object.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -115,8 +116,19 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
+Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
+	Vertex* varr = new Vertex[arrSize];
+	for (unsigned i = 0; i < arrSize; ++i) {
+		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
+		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
+		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
+		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
+	}
 
-void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
+	return varr;
+}
+
+void drawScene(GLFWwindow* window, float angle_x, float angle_y, Object& otest) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -127,32 +139,38 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y) {
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
 
-	glm::mat4 M = glm::mat4(1.0f);
-	M = glm::rotate(M, angle_y, glm::vec3(1.0f, 0.0f, 0.0f)); //Wylicz macierz modelu
-	M = glm::rotate(M, angle_x, glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz modelu
-
-	sp->use();//Aktywacja programu cieniującego
-	//Przeslij parametry programu cieniującego do karty graficznej
-	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
+	otest.activateShader();
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
-	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
+	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
 
-	glEnableVertexAttribArray(sp->a("vertex"));
-	glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, myCubeVertices);
+	otest.setRotation(glm::vec3(angle_x, angle_y, 0));
+	otest.render();
 
-	glEnableVertexAttribArray(sp->a("color"));
-	glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, myCubeColors);
-	
-	glEnableVertexAttribArray(sp->a("normal"));
-	glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, myCubeNormals);
-	//test.setRotation(glm::vec3(angle_y, angle_x, 0));
-	//test.render(sp);
-	//glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
-	glDrawArrays(GL_TRIANGLES, 0, myCubeVertexCount);
+	//glm::mat4 M = glm::mat4(1.0f);
+	//M = glm::rotate(M, angle_y, glm::vec3(1.0f, 0.0f, 0.0f)); //Wylicz macierz modelu
+	//M = glm::rotate(M, angle_x, glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz modelu
 
-	glDisableVertexAttribArray(sp->a("normal"));
-	glDisableVertexAttribArray(sp->a("color"));
-	glDisableVertexAttribArray(sp->a("vertex"));
+	//sp->use();//Aktywacja programu cieniującego
+	////Przeslij parametry programu cieniującego do karty graficznej
+	//glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
+	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
+	//glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
+
+	//glEnableVertexAttribArray(sp->a("vertex"));
+	//glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, myCubeVertices);
+
+	//glEnableVertexAttribArray(sp->a("color"));
+	//glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, myCubeColors);
+	//
+	//glEnableVertexAttribArray(sp->a("normal"));
+	//glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, myCubeNormals);
+
+	////glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
+	//glDrawArrays(GL_TRIANGLES, 0, myCubeVertexCount);
+
+	//glDisableVertexAttribArray(sp->a("normal"));
+	//glDisableVertexAttribArray(sp->a("color"));
+	//glDisableVertexAttribArray(sp->a("vertex"));
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
@@ -181,6 +199,8 @@ int main(void)
 	glfwMakeContextCurrent(window); //Od tego momentu kontekst okna staje się aktywny i polecenia OpenGL będą dotyczyć właśnie jego.
 	glfwSwapInterval(1); //Czekaj na 1 powrót plamki przed pokazaniem ukrytego bufora
 
+	std::cout << glGetString(GL_VERSION) << std::endl;
+
 	if (glewInit() != GLEW_OK) { //Zainicjuj bibliotekę GLEW
 		fprintf(stderr, "Nie można zainicjować GLEW.\n");
 		exit(EXIT_FAILURE);
@@ -188,13 +208,15 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	//Vertex vtest[myCubeVertexCount];
-	//for (int i = 0; i < myCubeVertexCount; ++i) {
-	//	vtest[i].position = glm::vec4(myCubeVertices[4 * i], myCubeVertices[4 * i + 1], myCubeVertices[4 * i + 2], myCubeVertices[4 * i + 3]);
-	//	vtest[i].color = glm::vec4(myCubeColors[4 * i], myCubeColors[4 * i + 1], myCubeColors[4 * i + 2], myCubeColors[4 * i + 3]);
-	//	vtest[i].normal = glm::vec4(myCubeNormals[4 * i], myCubeNormals[4 * i + 1], myCubeNormals[4 * i + 2], myCubeNormals[4 * i + 3]);
-	//}
-	//Mesh test(vtest, myCubeVertexCount, nullptr, NULL);
+	Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
+	Object otest(sp, vtest, (GLuint)myCubeVertexCount);
+
+	GLuint VAO, VBO;
+	glGenBuffers(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
@@ -206,7 +228,7 @@ int main(void)
 		angle_x += speed_x * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		angle_y += speed_y * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		glfwSetTime(0); //Zeruj timer
-		drawScene(window, angle_x, angle_y); //Wykonaj procedurę rysującą
+		drawScene(window, angle_x, angle_y, otest); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
 	}
 

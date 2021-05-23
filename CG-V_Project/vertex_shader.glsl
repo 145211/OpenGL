@@ -9,6 +9,7 @@ uniform mat4 M;
 in vec4 vertex; //wspolrzedne wierzcholka w przestrzeni modelu
 in vec4 color; //kolor związany z wierzchołkiem
 in vec4 normal; //wektor normalny w przestrzeni modelu
+in vec4 texCoord;
 
 
 //Zmienne interpolowane
