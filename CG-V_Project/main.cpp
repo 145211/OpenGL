@@ -22,21 +22,23 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 #include "myCube.h"
 
 float aspectRatio = 1;
-float movementSpeed = 0.3;
+float movementSpeed = 0.1;
 float sensitivity = 0.1;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
 
+glm::vec4 pressedKeys = glm::vec4(0,0,0,0);
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-glm::vec3 playerPos = glm::vec3(0.0f);
+glm::vec3 playerPos = glm::vec3(10.0f, 3.0f, -60.0f);
 glm::vec3 moveVec = glm::vec3(0.0f);
 
 
@@ -53,17 +55,16 @@ void error_callback(int error, const char* description) {
 //Keyboard handilng
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
-		movementSpeed = 0.3;
-		if (key == GLFW_KEY_LEFT) { moveVec = glm::normalize(glm::cross(cameraFront, cameraUp)) * -movementSpeed; };
-		if (key == GLFW_KEY_RIGHT) moveVec = glm::normalize(glm::cross(cameraFront, cameraUp)) * movementSpeed;
-		if (key == GLFW_KEY_UP) moveVec = cameraFront * movementSpeed;
-		if (key == GLFW_KEY_DOWN) moveVec = -cameraFront * movementSpeed;
+		if (key == GLFW_KEY_LEFT) pressedKeys[0] = 1;
+		if (key == GLFW_KEY_RIGHT) pressedKeys[1] = 1;
+		if (key == GLFW_KEY_UP) pressedKeys[2] = 1;
+		if (key == GLFW_KEY_DOWN) pressedKeys[3] = 1;
 	}
 	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_LEFT) moveVec = glm::vec3(0.0f);
-		if (key == GLFW_KEY_RIGHT) moveVec = glm::vec3(0.0f);
-		if (key == GLFW_KEY_UP) moveVec = glm::vec3(0.0f);
-		if (key == GLFW_KEY_DOWN) moveVec = glm::vec3(0.0f);
+		if (key == GLFW_KEY_LEFT) pressedKeys[0] = 0;
+		if (key == GLFW_KEY_RIGHT) pressedKeys[1] = 0;
+		if (key == GLFW_KEY_UP) pressedKeys[2] = 0;
+		if (key == GLFW_KEY_DOWN) pressedKeys[3] = 0;
 	}
 }
 
@@ -193,6 +194,26 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
 
+void collision(){
+	if (playerPos.z > -2.5)
+		playerPos.y = 3;
+	else if (playerPos.z > -4.5)
+		playerPos.y = 2 + ((playerPos.z + 4.5)/2);
+	else 
+		playerPos.y = 2;
+}
+
+void movementKeys()
+{
+	//start
+	if (pressedKeys[0] == 1) moveVec.xz = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * -movementSpeed;
+	if (pressedKeys[1] == 1) moveVec.xz = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * movementSpeed;
+	if (pressedKeys[2] == 1) moveVec.xz = cameraFront.xz * movementSpeed;
+	if (pressedKeys[3] == 1) moveVec.xz = cameraFront.xz * -movementSpeed;
+	//stop
+	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
+
+}
 
 int main(void)
 {
@@ -244,12 +265,17 @@ int main(void)
 	glfwSetTime(0); //Zeruj timer
 	while (!glfwWindowShouldClose(window)) //Tak długo jak okno nie powinno zostać zamknięte
 	{
-
 		angle_x += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		angle_y += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		glfwSetTime(0); //Zeruj timer
 		drawScene(window, angle_x, angle_y, playerPos, otest); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
+
+		movementKeys();
+		collision();
+
+		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%i, %i, %i, %i\n", pressedKeys[0], pressedKeys[1], pressedKeys[2], pressedKeys[3]);
 	}
 
 	freeOpenGLProgram(window);
