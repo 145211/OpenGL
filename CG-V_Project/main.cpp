@@ -28,6 +28,7 @@
 
 float aspectRatio = 1;
 float movementSpeed = 0.1;
+float sprint = 0.1;
 float sensitivity = 0.1;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -38,7 +39,8 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-glm::vec3 playerPos = glm::vec3(10.0f, 3.0f, -60.0f);
+glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
+glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
 
@@ -55,16 +57,19 @@ void error_callback(int error, const char* description) {
 //Keyboard handilng
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
-		if (key == GLFW_KEY_LEFT) pressedKeys[0] = 1;
-		if (key == GLFW_KEY_RIGHT) pressedKeys[1] = 1;
-		if (key == GLFW_KEY_UP) pressedKeys[2] = 1;
-		if (key == GLFW_KEY_DOWN) pressedKeys[3] = 1;
+		if (key == GLFW_KEY_A) pressedKeys[0] = 1;
+		if (key == GLFW_KEY_D) pressedKeys[1] = 1;
+		if (key == GLFW_KEY_W) pressedKeys[2] = 1;
+		if (key == GLFW_KEY_S) pressedKeys[3] = 1;
+		if (key == GLFW_KEY_R) playerPos = startPos;
+		if (key == GLFW_KEY_LEFT_SHIFT) movementSpeed += sprint;
 	}
 	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_LEFT) pressedKeys[0] = 0;
-		if (key == GLFW_KEY_RIGHT) pressedKeys[1] = 0;
-		if (key == GLFW_KEY_UP) pressedKeys[2] = 0;
-		if (key == GLFW_KEY_DOWN) pressedKeys[3] = 0;
+		if (key == GLFW_KEY_A) pressedKeys[0] = 0;
+		if (key == GLFW_KEY_D) pressedKeys[1] = 0;
+		if (key == GLFW_KEY_W) pressedKeys[2] = 0;
+		if (key == GLFW_KEY_S) pressedKeys[3] = 0;
+		if (key == GLFW_KEY_LEFT_SHIFT) movementSpeed -= sprint;
 	}
 }
 
@@ -205,14 +210,19 @@ void collision(){
 
 void movementKeys()
 {
-	//start
-	if (pressedKeys[0] == 1) moveVec.xz = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * -movementSpeed;
-	if (pressedKeys[1] == 1) moveVec.xz = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * movementSpeed;
-	if (pressedKeys[2] == 1) moveVec.xz = cameraFront.xz * movementSpeed;
-	if (pressedKeys[3] == 1) moveVec.xz = cameraFront.xz * -movementSpeed;
-	//stop
-	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
+	glm::vec2 horiVec;
+	glm::vec2 vertVec;
+	
+	horiVec = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * (pressedKeys[1] - pressedKeys[0]);
 
+	vertVec = cameraFront.xz * (pressedKeys[2] - pressedKeys[3]);
+	
+	if (horiVec + vertVec == glm::vec2(0, 0))
+		moveVec.xz = glm::vec3(0, 0, 0);
+	else
+		moveVec.xz = normalize(horiVec + vertVec) * movementSpeed;
+
+	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
 }
 
 int main(void)
@@ -274,8 +284,8 @@ int main(void)
 		movementKeys();
 		collision();
 
+		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
-		printf("%i, %i, %i, %i\n", pressedKeys[0], pressedKeys[1], pressedKeys[2], pressedKeys[3]);
 	}
 
 	freeOpenGLProgram(window);
