@@ -2,9 +2,9 @@
 
 ### TODO list
 - [x] Kamera FPS / Paweł
-- [ ] Poruszanie się w przestrzeni
+- [ ] Poruszanie się w przestrzeni / Prawie
 - [ ] Kolizje
-- [ ] Import modeli / Paweł
+- [x] Import modeli / Paweł
 - [x] Import tekstur / Paweł
 - [ ] Rozmieszczenie elementów na mapie
 - [ ] Podstawowy render importowanych modeli
