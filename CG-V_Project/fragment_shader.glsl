@@ -18,7 +18,7 @@ out vec4 pixelColor; //Zmienna wyjsciowa fragment shadera. Zapisuje sie do niej 
 in vec4 ic; 
 in vec4 iN; 
 in vec4 iL; 
-
+in vec2 itexCoord;
 
 void main(void) {
 	vec4 n = normalize(iN);
@@ -26,5 +26,5 @@ void main(void) {
 
 	float nl = clamp(dot(n, l), 0, 1);
 	
-	pixelColor = ic * vec4(nl);
+	pixelColor = texture(textureMap0, itexCoord) * vec4(nl);
 }

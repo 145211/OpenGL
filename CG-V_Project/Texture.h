@@ -17,8 +17,13 @@ private:
 	GLint textureUnit;
 
 public:
+	Texture(GLint texture_unit, unsigned int type);
 	Texture(const char* fileName, GLenum type, GLint texture_unit);
 	~Texture();
+
+	void loadTexture(const char* fileName);
+	//void setTextureUnit();
+
 
 	GLuint getID() const { return this->id; }
 	void bind();

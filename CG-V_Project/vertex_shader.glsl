@@ -9,7 +9,7 @@ uniform mat4 M;
 in vec4 vertex; //wspolrzedne wierzcholka w przestrzeni modelu
 in vec4 color; //kolor związany z wierzchołkiem
 in vec4 normal; //wektor normalny w przestrzeni modelu
-in vec4 texCoord;
+in vec2 texCoord;
 
 uniform vec3 playerPos;
 
@@ -18,12 +18,13 @@ uniform vec3 playerPos;
 out vec4 ic;
 out vec4 iN;
 out vec4 iL;
+out vec2 itexCoord;
 
 void main(void) {
     //vec4 lp = vec4(0, 0, -6, 1);
     vec4 lp = vec4(playerPos, 1);
 
-
+    itexCoord = texCoord;
     ic = color;
     iL = normalize(V * lp - V * M * vertex);
     iN = normalize(V * M * normal);

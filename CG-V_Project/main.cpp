@@ -43,11 +43,12 @@ glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
+Texture tex(0, GL_TEXTURE_2D);
 
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
 
-ShaderProgram* sp;
+ShaderProgram* sp, *skyboxsp;
 
 //Error handling
 void error_callback(int error, const char* description) {
@@ -179,7 +180,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+	tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
+	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
 }
 
 //Zwolnienie zasobów zajętych przez program
@@ -189,17 +192,17 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
-Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
-	Vertex* varr = new Vertex[arrSize];
-	for (unsigned i = 0; i < arrSize; ++i) {
-		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
-		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
-		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
-		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
-	}
-
-	return varr;
-}
+//Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
+//	Vertex* varr = new Vertex[arrSize];
+//	for (unsigned i = 0; i < arrSize; ++i) {
+//		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
+//		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
+//		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
+//		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
+//	}
+//
+//	return varr;
+//}
 
 void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Object& otest) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
@@ -222,6 +225,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
 	//otest.setRotation(glm::vec3(angle_x, angle_y, 0));
+	tex.bind();
 	otest.render();
 
 	//glm::mat4 M = glm::mat4(1.0f);
@@ -279,6 +283,51 @@ void movementKeys()
 	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
 }
 
+float skyboxVertices[] = {
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
+
 int main(void)
 {
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
@@ -312,16 +361,14 @@ int main(void)
 	initOpenGLProgram(window); //Operacje inicjujące
 
 	//Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
-	std::vector<Vertex> vtest = loadOBJ("Pantheon_without_cube.obj");
+	std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
 	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
+	std::vector<Vertex> vskybox;
+	for (int i = 0; i < (sizeof(skyboxVertices) / sizeof(float))/3; ++i) {
+		vskybox.push_back(Vertex{ glm::vec4(skyboxVertices[3 * i], skyboxVertices[3 * i + 1], skyboxVertices[3 * i + 2], 0), glm::vec4(0.0f), glm::vec2(0.0f), glm::vec4(0.0f) });
+	}
 	Object otest(sp, vtest.data(), (GLuint)vtest.size());
-
-	GLuint VAO, VBO;
-	glGenBuffers(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Object skybox(skyboxsp, vskybox.data(), (GLuint)(sizeof(skyboxVertices) / sizeof(float)));
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
