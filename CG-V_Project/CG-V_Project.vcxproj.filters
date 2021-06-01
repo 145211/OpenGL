@@ -76,5 +76,11 @@
     <None Include="vertex_shader.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="skybox_vertex_shader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="skybox_fragment_shader.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
