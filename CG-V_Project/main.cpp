@@ -15,6 +15,7 @@
 #include "Model.h"
 #include "Vertex.h"
 #include "Object.h"
+#include "Entity.h"
 
 #include "Collisions.h"
 
@@ -230,7 +231,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
 	//otest.setRotation(glm::vec3(angle_x, angle_y, 0));
-	tex.bind();
+	tex.bindTexture();
 	otest.render();
 
 	//glm::mat4 M = glm::mat4(1.0f);
@@ -287,51 +288,6 @@ void movementKeys()
 
 	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
 }
-
-float skyboxVertices[] = {
-	// positions          
-	-1.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	-1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f
-};
 
 int main(void)
 {

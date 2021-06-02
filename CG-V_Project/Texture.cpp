@@ -47,12 +47,12 @@ void Texture::loadTexture(const char* fileName)
 	glBindTexture(type, 0);
 }
 
-void Texture::bind() {
+void Texture::bindTexture() {
 	glActiveTexture(GL_TEXTURE0 + this->textureUnit);
 	glBindTexture(this->type, this->id);
 }
 
-void Texture::unbind() {
+void Texture::unbindTexture() {
 	glActiveTexture(0);
 	glBindTexture(this->type, 0);
 }

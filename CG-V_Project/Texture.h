@@ -25,8 +25,8 @@ public:
 	//void setTextureUnit();
 
 
-	GLuint getID() const { return this->id; }
-	void bind();
-	void unbind();
+	GLuint getTextureID() const { return this->id; }
+	void bindTexture();
+	void unbindTexture();
 	inline GLint getTextureUnit() const;
 };

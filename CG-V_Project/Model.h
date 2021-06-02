@@ -35,8 +35,8 @@ public:
 	glm::vec4* getNormalsArray();
 	//glm::vec4* getFacesArray();
 
-	size_t size();
-	Vertex* data();
+	size_t arraySize();
+	Vertex* vertexData();
 
 	void setPosition(glm::vec3 position);
 	void setRotation(glm::vec3 rotation);

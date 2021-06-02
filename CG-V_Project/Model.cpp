@@ -154,12 +154,12 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 	}
 }
 
-size_t Model::size()
+size_t Model::arraySize()
 {
 	return vertexArray.size();
 }
 
-Vertex* Model::data()
+Vertex* Model::vertexData()
 {
 	return vertexArray.data();
 }
