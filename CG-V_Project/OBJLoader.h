@@ -32,22 +32,22 @@ static std::vector<Vertex> loadOBJ(const char* file_name)
 	std::vector<glm::fvec2> vertex_texcoords;
 	std::vector<glm::fvec4> vertex_normals;
 
-	vertex_positions.reserve(400000);
-	vertex_texcoords.reserve(400000);
-	vertex_normals.reserve(400000);
+	vertex_positions.reserve(200000);
+	vertex_texcoords.reserve(200000);
+	vertex_normals.reserve(200000);
 
 	//Face vectors
 	std::vector<GLint> vertex_position_indicies;
 	std::vector<GLint> vertex_texcoord_indicies;
 	std::vector<GLint> vertex_normal_indicies;
 
-	vertex_position_indicies.reserve(500000);
-	vertex_texcoord_indicies.reserve(500000);
-	vertex_normal_indicies.reserve(500000);
+	vertex_position_indicies.reserve(300000);
+	vertex_texcoord_indicies.reserve(300000);
+	vertex_normal_indicies.reserve(300000);
 
 	//Vertex array
 	std::vector<Vertex> vertices;
-	vertices.reserve(400000);
+	vertices.reserve(200000);
 
 	std::stringstream ss;
 	std::ifstream in_file(file_name);

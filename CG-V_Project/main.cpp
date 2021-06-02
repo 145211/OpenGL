@@ -28,9 +28,9 @@
 
 #include "myCube.h"
 
-float aspectRatio = 1;
-float movementSpeed = 0.2;
-float sprint = 0.2;
+float aspectRatio = 16.f/9.f;
+float movementSpeed = 0.1;
+float sprint = 0.1;
 float sensitivity = 0.1;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -45,10 +45,12 @@ glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
+Texture tex(0, GL_TEXTURE_2D);
+
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
 
-ShaderProgram* sp;
+ShaderProgram* sp, *skyboxsp;
 
 
 
@@ -111,27 +113,64 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	cameraFront = glm::normalize(front);
 }
 
-void movementKeys()
-{
-	glm::vec2 horiVec;
-	glm::vec2 vertVec;
-
-	horiVec = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * (pressedKeys[1] - pressedKeys[0]);
-
-	vertVec = cameraFront.xz * (pressedKeys[2] - pressedKeys[3]);
-
-	if (horiVec + vertVec == glm::vec2(0, 0))
-		moveVec = glm::vec3(0, 0, 0);
-	else
-		moveVec.xz = normalize(horiVec + vertVec) * movementSpeed;
-
-	if (pressedKeys == glm::vec4(0, 0, 0, 0)) moveVec = glm::vec3(0, 0, 0);
-}
-
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	if (height == 0) return;
 	aspectRatio = (float)width / (float)height;
 	glViewport(0, 0, width, height);
+}
+
+GLuint readTexture(const char* filename) {
+	GLuint tex;
+	glActiveTexture(GL_TEXTURE0);
+
+	//Load into computer's memory
+	std::vector<unsigned char> image;   //Allocate a vector for image storage
+	unsigned width, height;   //Variables for image size
+	//Read image
+	unsigned error = lodepng::decode(image, width, height, filename);
+
+	//Import into graphics card's memory
+	glGenTextures(1, &tex); //Initialize one handle
+	glBindTexture(GL_TEXTURE_2D, tex); //Activate the handle
+	//Import image into graphics card's memory associated with the handle
+	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return tex;
+}
+
+GLuint loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	unsigned width, height;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		std::vector<unsigned char> image;
+		unsigned error = lodepng::decode(image, width, height, faces[i].c_str());
+		if (image.size())
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+			image.clear();
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			image.clear();
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
 }
 
 //Procedura inicjująca
@@ -145,7 +184,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+	tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
+	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
 }
 
 //Zwolnienie zasobów zajętych przez program
@@ -155,17 +196,17 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
-Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
-	Vertex* varr = new Vertex[arrSize];
-	for (unsigned i = 0; i < arrSize; ++i) {
-		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
-		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
-		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
-		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
-	}
-
-	return varr;
-}
+//Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
+//	Vertex* varr = new Vertex[arrSize];
+//	for (unsigned i = 0; i < arrSize; ++i) {
+//		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
+//		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
+//		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
+//		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
+//	}
+//
+//	return varr;
+//}
 
 void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Object& otest) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
@@ -180,7 +221,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 		/*glm::vec3(0, 0, -6)*/ playerPos + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
-	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
 	otest.activateShader();
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
@@ -189,6 +230,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
 	//otest.setRotation(glm::vec3(angle_x, angle_y, 0));
+	tex.bind();
 	otest.render();
 
 	//glm::mat4 M = glm::mat4(1.0f);
@@ -229,6 +271,68 @@ void collision(){
 		playerPos.y = 2;
 }
 
+void movementKeys()
+{
+	glm::vec2 horiVec;
+	glm::vec2 vertVec;
+	
+	horiVec = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * (pressedKeys[1] - pressedKeys[0]);
+
+	vertVec = cameraFront.xz * (pressedKeys[2] - pressedKeys[3]);
+	
+	if (horiVec + vertVec == glm::vec2(0, 0))
+		moveVec.xz = glm::vec3(0, 0, 0);
+	else
+		moveVec.xz = normalize(horiVec + vertVec) * movementSpeed;
+
+	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
+}
+
+float skyboxVertices[] = {
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
+
 int main(void)
 {
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
@@ -240,7 +344,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL.
+	window = glfwCreateWindow(1280, 720, "OpenGL", NULL, NULL);
 
 	if (!window) //Jeżeli okna nie udało się utworzyć, to zamknij program
 	{
@@ -261,17 +365,14 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	//Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
-	std::vector<Vertex> vtest = loadOBJ("Pantheon_without_cube.obj");
+	std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
 	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
+	//std::vector<Vertex> vskybox;
+	//for (int i = 0; i < (sizeof(skyboxVertices) / sizeof(float))/3; ++i) {
+	//	vskybox.push_back(Vertex{ glm::vec4(skyboxVertices[3 * i], skyboxVertices[3 * i + 1], skyboxVertices[3 * i + 2], 0), glm::vec4(0.0f), glm::vec2(0.0f), glm::vec4(0.0f) });
+	//}
 	Object otest(sp, vtest.data(), (GLuint)vtest.size());
-
-	GLuint VAO, VBO;
-	glGenBuffers(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//Object skybox(skyboxsp, vskybox.data(), (GLuint)(sizeof(skyboxVertices) / sizeof(float)));
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
