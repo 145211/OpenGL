@@ -138,3 +138,7 @@ GLuint Object::getVertexCount() const
 {
 	return vertexCount;
 }
+
+glm::vec3 Object::getPos() {
+	return this->position;
+};

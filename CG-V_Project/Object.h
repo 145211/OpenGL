@@ -53,4 +53,6 @@ public:
 
 	void disableAll();
 	void activateObject();
+
+	glm::vec3 getPos();
 };

@@ -16,6 +16,8 @@
 #include "Vertex.h"
 #include "Object.h"
 
+#include "Collisions.h"
+
 #include "OBJLoader.h"
 
 #include <stdlib.h>
@@ -27,8 +29,8 @@
 #include "myCube.h"
 
 float aspectRatio = 1;
-float movementSpeed = 0.1;
-float sprint = 0.1;
+float movementSpeed = 0.2;
+float sprint = 0.2;
 float sensitivity = 0.1;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -43,11 +45,12 @@ glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
-
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
 
 ShaderProgram* sp;
+
+
 
 //Error handling
 void error_callback(int error, const char* description) {
@@ -108,6 +111,23 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 	cameraFront = glm::normalize(front);
 }
 
+void movementKeys()
+{
+	glm::vec2 horiVec;
+	glm::vec2 vertVec;
+
+	horiVec = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * (pressedKeys[1] - pressedKeys[0]);
+
+	vertVec = cameraFront.xz * (pressedKeys[2] - pressedKeys[3]);
+
+	if (horiVec + vertVec == glm::vec2(0, 0))
+		moveVec = glm::vec3(0, 0, 0);
+	else
+		moveVec.xz = normalize(horiVec + vertVec) * movementSpeed;
+
+	if (pressedKeys == glm::vec4(0, 0, 0, 0)) moveVec = glm::vec3(0, 0, 0);
+}
+
 void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	if (height == 0) return;
 	aspectRatio = (float)width / (float)height;
@@ -152,6 +172,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//playerPos += glm::vec3(speed_x, 0, speed_z) * cameraFront;
+	moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
 	playerPos += moveVec;
 
 	glm::mat4 V = glm::lookAt(
@@ -208,23 +229,6 @@ void collision(){
 		playerPos.y = 2;
 }
 
-void movementKeys()
-{
-	glm::vec2 horiVec;
-	glm::vec2 vertVec;
-	
-	horiVec = glm::normalize(glm::cross(cameraFront, cameraUp)).xz * (pressedKeys[1] - pressedKeys[0]);
-
-	vertVec = cameraFront.xz * (pressedKeys[2] - pressedKeys[3]);
-	
-	if (horiVec + vertVec == glm::vec2(0, 0))
-		moveVec.xz = glm::vec3(0, 0, 0);
-	else
-		moveVec.xz = normalize(horiVec + vertVec) * movementSpeed;
-
-	if (pressedKeys == glm::vec4(0,0,0,0)) moveVec = glm::vec3(0.0f);
-}
-
 int main(void)
 {
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
@@ -277,6 +281,7 @@ int main(void)
 	{
 		angle_x += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		angle_y += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
+		
 		glfwSetTime(0); //Zeruj timer
 		drawScene(window, angle_x, angle_y, playerPos, otest); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
@@ -286,6 +291,7 @@ int main(void)
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%f, %f, %f\n", otest.getPos().x, otest.getPos().y, otest.getPos().z);
 	}
 
 	freeOpenGLProgram(window);
