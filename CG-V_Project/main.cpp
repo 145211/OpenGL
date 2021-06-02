@@ -26,7 +26,7 @@
 
 #include "myCube.h"
 
-float aspectRatio = 1;
+float aspectRatio = 16.f/9.f;
 float movementSpeed = 0.1;
 float sprint = 0.1;
 float sensitivity = 0.1;
@@ -216,7 +216,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 		/*glm::vec3(0, 0, -6)*/ playerPos + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
-	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
+	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
 	otest.activateShader();
 	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
@@ -339,7 +339,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	window = glfwCreateWindow(500, 500, "OpenGL", NULL, NULL);  //Utwórz okno 500x500 o tytule "OpenGL" i kontekst OpenGL.
+	window = glfwCreateWindow(1280, 720, "OpenGL", NULL, NULL);
 
 	if (!window) //Jeżeli okna nie udało się utworzyć, to zamknij program
 	{
@@ -360,13 +360,12 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	//Vertex* vtest = loadArrayToVertexArray(myCubeVertices, myCubeNormals, myCubeColors, myCubeTexCoords, myCubeVertexCount);
 	std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
 	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
-	std::vector<Vertex> vskybox;
-	for (int i = 0; i < (sizeof(skyboxVertices) / sizeof(float))/3; ++i) {
-		vskybox.push_back(Vertex{ glm::vec4(skyboxVertices[3 * i], skyboxVertices[3 * i + 1], skyboxVertices[3 * i + 2], 0), glm::vec4(0.0f), glm::vec2(0.0f), glm::vec4(0.0f) });
-	}
+	//std::vector<Vertex> vskybox;
+	//for (int i = 0; i < (sizeof(skyboxVertices) / sizeof(float))/3; ++i) {
+	//	vskybox.push_back(Vertex{ glm::vec4(skyboxVertices[3 * i], skyboxVertices[3 * i + 1], skyboxVertices[3 * i + 2], 0), glm::vec4(0.0f), glm::vec2(0.0f), glm::vec4(0.0f) });
+	//}
 	Object otest(sp, vtest.data(), (GLuint)vtest.size());
 	//Object skybox(skyboxsp, vskybox.data(), (GLuint)(sizeof(skyboxVertices) / sizeof(float)));
 

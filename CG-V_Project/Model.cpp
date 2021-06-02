@@ -1,4 +1,4 @@
-#include "model.h"
+﻿#include "model.h"
 
 Model::Model(const char* fileName)
 {
@@ -132,6 +132,26 @@ void Model::loadModel(const char* fileName)
 
 	//Loaded success
 	std::cout << "OBJ file loaded!" << "\n";
+}
+
+void Model::assimpLoadModel(std::string fileName) // do dokończenia
+{
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile("Pantheon_even_smaller.obj", aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+	std::cout << importer.GetErrorString() << std::endl;
+
+	aiMesh* mesh = scene->mMeshes[0];
+	for (int i = 0; i < mesh->mNumVertices; i++) {
+		aiVector3D vertex = mesh->mVertices[i];
+		aiVector3D normal = mesh->mNormals[i];
+
+		// liczba zdefiniowanych zestawów wsp. teksturowania (zestawów jest max 8)
+		unsigned int liczba_zest = mesh->GetNumUVChannels();
+		// Liczba składowych wsp. teksturowania dla 0 zestawu
+		unsigned int wymiar_wsp_tex = mesh->mNumUVComponents[0];
+
+		aiVector3D texCoord = mesh->mTextureCoords[0][i];
+	}
 }
 
 size_t Model::size()

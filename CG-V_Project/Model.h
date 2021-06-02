@@ -8,6 +8,11 @@
 #include "GL/glew.h"
 #include <fstream>
 #include <sstream>
+#include <string>
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 
 class Model {
@@ -23,6 +28,7 @@ public:
 	Model(const char* fileName);
 
 	void loadModel(const char* fileName);
+	void assimpLoadModel(std::string fileName);
 
 	glm::vec4* getVerticesArray();
 	glm::vec2* getTexCoordsArray();
