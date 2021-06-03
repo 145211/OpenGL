@@ -1,8 +1,22 @@
 ﻿#include "model.h"
 
+Model::Model() : position(glm::vec3(0.f)), rotation(glm::vec3(0.f)), scaling(glm::vec3(0.f)), origin(glm::vec3(0.f))
+{
+
+}
+
 Model::Model(const char* fileName)
 {
 	loadModel(fileName);
+}
+
+Model::Model(const Model& m)
+{
+	this->vertexArray = m.vertexArray;
+	this->position = m.position;
+	this->rotation = m.rotation;
+	this->scaling = m.scaling;
+	this->origin = m.origin;
 }
 
 void Model::loadModel(const char* fileName)
@@ -177,4 +191,24 @@ void Model::setRotation(glm::vec3 rotation)
 void Model::setScaling(glm::vec3 scaling)
 {
 	this->scaling = scaling;
+}
+
+glm::vec3 Model::getPosition() const
+{
+	return this->position;
+}
+
+glm::vec3 Model::getRotation() const
+{
+	return this->rotation;
+}
+
+glm::vec3 Model::getScaling() const
+{
+	return this->scaling;
+}
+
+glm::vec3 Model::getOrigin() const
+{
+	return this->origin;
 }

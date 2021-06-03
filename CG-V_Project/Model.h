@@ -19,13 +19,14 @@ class Model {
 private:
 	std::vector<Vertex> vertexArray;
 	
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scaling;
-	glm::vec3 origin;
+	glm::vec3 position = glm::vec3(0.f);
+	glm::vec3 rotation = glm::vec3(0.f);
+	glm::vec3 scaling = glm::vec3(1.f);
+	glm::vec3 origin = glm::vec3(0.f);
 public:
 	Model();
 	Model(const char* fileName);
+	Model(const Model& m);
 
 	void loadModel(const char* fileName);
 	void assimpLoadModel(std::string fileName);
@@ -41,6 +42,11 @@ public:
 	void setPosition(glm::vec3 position);
 	void setRotation(glm::vec3 rotation);
 	void setScaling(glm::vec3 scaling);
+
+	glm::vec3 getPosition() const;
+	glm::vec3 getRotation() const;
+	glm::vec3 getScaling() const;
+	glm::vec3 getOrigin() const;
 };
 
 #endif

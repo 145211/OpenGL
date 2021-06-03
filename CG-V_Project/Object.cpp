@@ -41,6 +41,7 @@ void Object::initVAO()
 	//glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 Object::Object(ShaderProgram* spPtr, Vertex* vertices, GLuint vertexCount, glm::vec3 position, glm::vec3 rotation, glm::vec3 scaling) : spPtr(spPtr)

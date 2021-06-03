@@ -30,9 +30,9 @@
 #include "myCube.h"
 
 float aspectRatio = 16.f/9.f;
-float movementSpeed = 0.1;
-float sprint = 0.1;
-float sensitivity = 0.1;
+float movementSpeed = 0.1f;
+float sprint = 0.1f;
+float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
 
@@ -46,7 +46,7 @@ glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
-Texture tex(0, GL_TEXTURE_2D);
+//Texture tex(0, GL_TEXTURE_2D);
 
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
@@ -185,7 +185,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // automatycznie centruje kursor w aplikacji oraz go ukrywa
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
-	tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
+	//tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
 }
@@ -209,7 +209,7 @@ void freeOpenGLProgram(GLFWwindow* window) {
 //	return varr;
 //}
 
-void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Object& otest) {
+void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Entity& otest) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -218,47 +218,23 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	playerPos += moveVec;
 
 	glm::mat4 V = glm::lookAt(
-		/*glm::vec3(0, 0, -6)*/ playerPos,
-		/*glm::vec3(0, 0, -6)*/ playerPos + cameraFront,
+		playerPos,
+		playerPos + cameraFront,
 		glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz widoku
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
-	otest.activateShader();
-	glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
-	glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
 
-	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
-
-	//otest.setRotation(glm::vec3(angle_x, angle_y, 0));
-	tex.bindTexture();
-	otest.render();
-
-	//glm::mat4 M = glm::mat4(1.0f);
-	//M = glm::rotate(M, angle_y+0.5f, glm::vec3(1.0f, 0.0f, 0.0f)); //Wylicz macierz modelu
-	//M = glm::rotate(M, angle_x, glm::vec3(0.0f, 1.0f, 0.0f)); //Wylicz macierz modelu
-
-	//sp->use();//Aktywacja programu cieniującego
-	////Przeslij parametry programu cieniującego do karty graficznej
-	//glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
+	otest.drawEntity(P, V);
+	//otest.activateShader();
 	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
-	//glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));
+	//glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
 
-	//glEnableVertexAttribArray(sp->a("vertex"));
-	//glVertexAttribPointer(sp->a("vertex"), 4, GL_FLOAT, false, 0, myCubeVertices);
+	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
-	//glEnableVertexAttribArray(sp->a("color"));
-	//glVertexAttribPointer(sp->a("color"), 4, GL_FLOAT, false, 0, myCubeColors);
-	//
-	//glEnableVertexAttribArray(sp->a("normal"));
-	//glVertexAttribPointer(sp->a("normal"), 4, GL_FLOAT, false, 0, myCubeNormals);
-
-	////glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexes);
-	//glDrawArrays(GL_TRIANGLES, 0, myCubeVertexCount);
-
-	//glDisableVertexAttribArray(sp->a("normal"));
-	//glDisableVertexAttribArray(sp->a("color"));
-	//glDisableVertexAttribArray(sp->a("vertex"));
+	////otest.setRotation(glm::vec3(angle_x, angle_y, 0));
+	//tex.bindTexture();
+	//otest.render();
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
@@ -267,7 +243,7 @@ void collision(){
 	if (playerPos.z > -2.5)
 		playerPos.y = 3;
 	else if (playerPos.z > -4.5)
-		playerPos.y = 2 + ((playerPos.z + 4.5)/2);
+		playerPos.y = 2.f + ((playerPos.z + 4.5f)/2.f);
 	else 
 		playerPos.y = 2;
 }
@@ -321,14 +297,14 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
+	//std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
 	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
-	//std::vector<Vertex> vskybox;
-	//for (int i = 0; i < (sizeof(skyboxVertices) / sizeof(float))/3; ++i) {
-	//	vskybox.push_back(Vertex{ glm::vec4(skyboxVertices[3 * i], skyboxVertices[3 * i + 1], skyboxVertices[3 * i + 2], 0), glm::vec4(0.0f), glm::vec2(0.0f), glm::vec4(0.0f) });
-	//}
-	Object otest(sp, vtest.data(), (GLuint)vtest.size());
-	//Object skybox(skyboxsp, vskybox.data(), (GLuint)(sizeof(skyboxVertices) / sizeof(float)));
+
+	//Object otest(sp, vtest.data(), (GLuint)vtest.size());
+	Texture* tex = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
+	Model model("Pantheon_even_smaller.obj");
+	Entity otest(tex, model, sp);
+	Entity::playerPos = &playerPos;
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
@@ -348,7 +324,7 @@ int main(void)
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
-		printf("%f, %f, %f\n", otest.getPos().x, otest.getPos().y, otest.getPos().z);
+		//printf("%f, %f, %f\n", otest.getPos().x, otest.getPos().y, otest.getPos().z);
 	}
 
 	freeOpenGLProgram(window);
