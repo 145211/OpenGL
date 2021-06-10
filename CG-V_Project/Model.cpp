@@ -166,6 +166,31 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 
 		aiVector3D texCoord = mesh->mTextureCoords[0][i];
 	}
+
+	// wczytywanie i liczenie faces
+	for (int i = 0; i < mesh->mNumFaces; ++i) {
+		aiFace& face = mesh->mFaces[i];
+
+		for (int j = 0; j < face.mNumIndices; j++) {
+			// tutaj w oryginale indices.push_back(face.mIndices[j]);
+		}
+	}
+	// liczenie materiałów
+	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	for (int i = 0; i < 19; ++i) {
+		std::cout << i << " " << material->GetTextureCount((aiTextureType)i) << std::endl;
+	}
+
+	// wczytywanie tekstur
+	for (int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i) {
+		aiString str; // nazwa pliku
+		aiTextureMapping mapping; // jak wygenerowano wsp tekstrurowania (optional)
+		unsigned int uvMapping; // numer zestawu wsp. teksturowania (optional)
+		ai_real blend; // współczynnik połączenia kolorów z kolejną teksturą (optional)
+		aiTextureOp op; // sposób łączenia kolorów z kolejną teksturą (optional)
+		aiTextureMapMode mapMode; // sposób adresowania tekstury (optional)
+		material->GetTexture(aiTextureType_DIFFUSE, i, &str);
+	}
 }
 
 size_t Model::arraySize()
