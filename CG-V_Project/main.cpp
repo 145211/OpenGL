@@ -26,11 +26,12 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <vector>
 
 #include "myCube.h"
 
 float aspectRatio = 16.f/9.f;
-float movementSpeed = 0.1f;
+float movementSpeed = 0.05f;
 float sprint = 0.1f;
 float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
@@ -53,7 +54,7 @@ float pitch = 0.0f;
 
 ShaderProgram* sp, *skyboxsp;
 
-
+std::vector<Collisions> objs;
 
 //Error handling
 void error_callback(int error, const char* description) {
@@ -188,6 +189,8 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
+	
+	objs = collisionInit(objs);
 }
 
 //Zwolnienie zasobów zajętych przez program
@@ -324,7 +327,6 @@ int main(void)
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
-		//printf("%f, %f, %f\n", otest.getPos().x, otest.getPos().y, otest.getPos().z);
 	}
 
 	freeOpenGLProgram(window);
