@@ -31,6 +31,7 @@ public:
 
 	void loadModel(const char* fileName);
 	void assimpLoadModel(std::string fileName);
+	//void assimpProcessNode(aiNode* node, const aiScene* scene);
 
 	glm::vec4* getVerticesArray();
 	glm::vec2* getTexCoordsArray();

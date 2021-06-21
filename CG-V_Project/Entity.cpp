@@ -74,7 +74,7 @@ void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
 	// Bind buffers
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 
 	// Bind texture
 	this->texture->bindTexture();

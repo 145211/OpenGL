@@ -167,7 +167,7 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 		
 		vertexArray.push_back(Vertex{ 
 			glm::vec4(vertex.x, vertex.y, vertex.z, 1),
-			glm::vec4(0, 0, 0, 1),  
+			glm::vec4(1, 1, 1, 1),  
 			glm::vec2(texCoord.x, texCoord.y),
 			glm::vec4(normal.x, normal.y, normal.z, 0) });
 	}
@@ -199,6 +199,21 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 	//	material->GetTexture(aiTextureType_DIFFUSE, i, &str);
 	//}
 }
+
+//void Model::assimpProcessNode(aiNode* node, const aiScene* scene)
+//{
+//	// process all the node's meshes (if any)
+//	for (unsigned int i = 0; i < node->mNumMeshes; i++)
+//	{
+//		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+//		meshes.push_back(processMesh(mesh, scene));
+//	}
+//	// then do the same for each of its children
+//	for (unsigned int i = 0; i < node->mNumChildren; i++)
+//	{
+//		processNode(node->mChildren[i], scene);
+//	}
+//}
 
 size_t Model::arraySize()
 {
