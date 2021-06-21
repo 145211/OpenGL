@@ -151,7 +151,7 @@ void Model::loadModel(const char* fileName)
 void Model::assimpLoadModel(std::string fileName) // do dokończenia
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile("Pantheon_even_smaller.obj", aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+	const aiScene* scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 	std::cout << importer.GetErrorString() << std::endl;
 
 	aiMesh* mesh = scene->mMeshes[0];
@@ -163,34 +163,41 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 		unsigned int liczba_zest = mesh->GetNumUVChannels();
 		// Liczba składowych wsp. teksturowania dla 0 zestawu
 		unsigned int wymiar_wsp_tex = mesh->mNumUVComponents[0];
-
 		aiVector3D texCoord = mesh->mTextureCoords[0][i];
+		
+		vertexArray.push_back(Vertex{ 
+			glm::vec4(vertex.x, vertex.y, vertex.z, 1),
+			glm::vec4(0, 0, 0, 1),  
+			glm::vec2(texCoord.x, texCoord.y),
+			glm::vec4(normal.x, normal.y, normal.z, 0) });
 	}
 
 	// wczytywanie i liczenie faces
 	for (int i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace& face = mesh->mFaces[i];
-
 		for (int j = 0; j < face.mNumIndices; j++) {
+			indices.push_back(face.mIndices[j]);
 			// tutaj w oryginale indices.push_back(face.mIndices[j]);
 		}
 	}
+	std::cout << indices.size() << std::endl;
+	std::cout << vertexArray.size() << std::endl;
 	// liczenie materiałów
-	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-	for (int i = 0; i < 19; ++i) {
-		std::cout << i << " " << material->GetTextureCount((aiTextureType)i) << std::endl;
-	}
+	//aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	//for (int i = 0; i < 19; ++i) {
+	//	std::cout << i << " " << material->GetTextureCount((aiTextureType)i) << std::endl;
+	//}
 
 	// wczytywanie tekstur
-	for (int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i) {
-		aiString str; // nazwa pliku
-		aiTextureMapping mapping; // jak wygenerowano wsp tekstrurowania (optional)
-		unsigned int uvMapping; // numer zestawu wsp. teksturowania (optional)
-		ai_real blend; // współczynnik połączenia kolorów z kolejną teksturą (optional)
-		aiTextureOp op; // sposób łączenia kolorów z kolejną teksturą (optional)
-		aiTextureMapMode mapMode; // sposób adresowania tekstury (optional)
-		material->GetTexture(aiTextureType_DIFFUSE, i, &str);
-	}
+	//for (int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i) {
+	//	aiString str; // nazwa pliku
+	//	aiTextureMapping mapping; // jak wygenerowano wsp tekstrurowania (optional)
+	//	unsigned int uvMapping; // numer zestawu wsp. teksturowania (optional)
+	//	ai_real blend; // współczynnik połączenia kolorów z kolejną teksturą (optional)
+	//	aiTextureOp op; // sposób łączenia kolorów z kolejną teksturą (optional)
+	//	aiTextureMapMode mapMode; // sposób adresowania tekstury (optional)
+	//	material->GetTexture(aiTextureType_DIFFUSE, i, &str);
+	//}
 }
 
 size_t Model::arraySize()
@@ -198,9 +205,19 @@ size_t Model::arraySize()
 	return vertexArray.size();
 }
 
+size_t Model::indicesSize()
+{
+	return indices.size();
+}
+
 Vertex* Model::vertexData()
 {
 	return vertexArray.data();
+}
+
+GLuint* Model::indicesData()
+{
+	return indices.data();
 }
 
 void Model::setPosition(glm::vec3 position)

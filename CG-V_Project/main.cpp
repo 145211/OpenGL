@@ -306,6 +306,8 @@ int main(void)
 	//Object otest(sp, vtest.data(), (GLuint)vtest.size());
 	Texture* tex = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
 	Model model("Pantheon_even_smaller.obj");
+	//Model model;
+	//model.assimpLoadModel("monument_test.obj");
 	Entity otest(tex, model, sp);
 	Entity::playerPos = &playerPos;
 
