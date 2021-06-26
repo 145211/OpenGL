@@ -30,27 +30,23 @@ bool Collisions::inRect(vec2 M) {
 	return 0;
 };
 
+bool ccw(vec2 A, vec2 B, vec2 C) {
+	return ((C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x));
+}
+
 //sprawdzenie z którym bokiem nastepuje kolizja
 vector<vec2> intersection(Collisions obj, vec2 pos, vec2 des) {
 	vector<vec2> sides = { obj.A, obj.B, obj.C, obj.D, obj.A };
 
 	for (int i = 0; i < 4; i++)
 	{
-		float denom = (des[1] - pos[1]) * (sides[i + 1][0] - sides[i][0]) - (des[0] - pos[0]) * (sides[i + 1][1] - sides[i][1]);
-		float numera = (des[0] - pos[0]) * (sides[i][1] - pos[1]) - (des[1] - pos[1]) * (sides[i][0] - pos[0]);
-		float numerb = (sides[i + 1][0] - sides[i][0]) * (sides[i][1] - pos[1]) - (sides[i + 1][1] - sides[i][1]) * (sides[i][0] - pos[0]);
-
-		if (denom == 0)
-			continue;
-
-		float mua = numera / denom;
-		float mub = numerb / denom;
-
-		if (mua < 0 || mua > 1 || mub < 0 || mub > 1)
-			continue;
-
-		return { sides[i], sides[i + 1] };
+		if (ccw(sides[i], pos, des) != ccw(sides[i + 1], pos, des) and ccw(sides[i], sides[i + 1], pos) != ccw(sides[i], sides[i + 1], des)) {
+			//printf("side %i\n", i + 1);
+			return { sides[i], sides[i + 1] };
+		}
 	}
+
+	return { vec2(0, 0) };
 };
 
 //obliczanie kolizji
@@ -58,16 +54,24 @@ vec2 Collide(vec2 pos, vec2 move, vector<Collisions> objs) {
 	vec2 des = pos + move;
 	for (int i = 0; i < objs.size(); i++)
 	{
-		//printf("%f, %f, inRect: %i, size: %i\n", destination.x, destination.y, objs[i].inRect(destination), sizeof(objs));
 		if (objs[i].inRect(des) == 1)
 		{
+			//printf("%f, %f, inRect: %i\n", des.x, des.y, objs[i].inRect(des));
+
 			vector<vec2> wall = intersection(objs[i], pos, des);
+
+			if (wall.size() == 1) {
+				//return -move;
+				continue;
+			}
 
 			vec2 norm = normalize(-vec2(-(wall[1].y - wall[0].y), (wall[1].x - wall[0].x)));
 
+			//printf("norm: %f, %f\n", norm.x, norm.y);
+
 			move = move - dot(norm, move) * norm;
 
-			return move;
+			//printf("move: %f, %f\n", move.x, move.y);
 		}
 	}
 	return move;
@@ -96,14 +100,21 @@ vector<Collisions> squareArray(vec2 start, vec2 end, float ammount, float side, 
 	return objs;
 };
 
+Collisions diagonal(vec2 A, vec2 B, vec2 C) {
+	return Collisions(A, B, C, (A + C) - B);
+}
+
 //procedura tworzaca wektor obiektow kolizji
 vector<Collisions> collisionInit(vector<Collisions> objs) {
+	//big collumns
 	objs = squareArray(vec2(23, 0), vec2(23, 46.5), 11, 2.75, objs);
 	objs = squareArray(vec2(0, 0), vec2(0, 46.5), 11, 2.75, objs);
-
 	objs = squareArray(vec2(15.75, 0), vec2(7.75, 0), 2, 2.75, objs);
-	objs = squareArray(vec2(8.25, 39), vec2(8.25, 9.65), 4, 1.4, objs);
-	objs = squareArray(vec2(15.15, 39), vec2(15.15, 9.65), 4, 1.4, objs);
+	//small collumns
+	objs = squareArray(vec2(8.25, 39), vec2(8.25, 9.65), 4, 1.5, objs);
+	objs = squareArray(vec2(15.15, 39), vec2(15.15, 9.65), 4, 1.5, objs);
+
+	//objs.push_back(diagonal(vec2(20, -49.5), vec2(18, -46), vec2(26.5, -41.5)));
 
 	return objs;
 };

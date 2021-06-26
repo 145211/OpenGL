@@ -54,7 +54,14 @@ float pitch = 0.0f;
 
 ShaderProgram* sp, *skyboxsp;
 
-std::vector<Collisions> objs;
+vector<Entity*> entities;
+
+vector<Collisions> objs;
+
+float ambientPwr = 0.8;
+vec3 lightColor = vec3(1, 0.95, 0.95);
+vec4 ambientLight = vec4(lightColor * ambientPwr, 1);
+
 
 //Error handling
 void error_callback(int error, const char* description) {
@@ -190,6 +197,9 @@ void initOpenGLProgram(GLFWwindow* window) {
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
 	
+	sp->use();
+	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
+
 	objs = collisionInit(objs);
 }
 
@@ -212,11 +222,10 @@ void freeOpenGLProgram(GLFWwindow* window) {
 //	return varr;
 //}
 
-void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, Entity& otest) {
+void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, vector<Entity*> entities) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//playerPos += glm::vec3(speed_x, 0, speed_z) * cameraFront;
 	moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
 	playerPos += moveVec;
 
@@ -227,8 +236,13 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
+	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
-	otest.drawEntity(P, V);
+
+	(*entities[0]).drawEntity(P, V);
+
+	(*entities[1]).drawEntity(P, V);
+
 	//otest.activateShader();
 	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
 	//glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
@@ -242,7 +256,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
 
-void collision(){
+void floorLevel(){
 	if (playerPos.z > -2.5)
 		playerPos.y = 3;
 	else if (playerPos.z > -4.5)
@@ -304,10 +318,19 @@ int main(void)
 	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
 
 	//Object otest(sp, vtest.data(), (GLuint)vtest.size());
-	Texture* tex = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
-	Model model("Pantheon_even_smaller.obj");
-	Entity otest(tex, model, sp);
+	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
+	Model model1("Pantheon_even_smaller.obj");
+	Entity otest(tex1, model1, sp);
 	Entity::playerPos = &playerPos;
+
+	entities.push_back(&otest);
+
+	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
+	Model model2("Monument_test.obj");
+	Entity monum(tex2, model2, sp);
+	Entity::playerPos = &playerPos;
+	
+	entities.push_back(&monum);
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
@@ -319,11 +342,11 @@ int main(void)
 		angle_y += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		
 		glfwSetTime(0); //Zeruj timer
-		drawScene(window, angle_x, angle_y, playerPos, otest); //Wykonaj procedurę rysującą
+		drawScene(window, angle_x, angle_y, playerPos, entities); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
 
 		movementKeys();
-		collision();
+		floorLevel();
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);

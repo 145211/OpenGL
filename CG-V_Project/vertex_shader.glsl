@@ -19,6 +19,7 @@ out vec4 ic;
 out vec4 iN;
 out vec4 iL;
 out vec2 itexCoord;
+out vec4 fragPos;
 
 void main(void) {
     //vec4 lp = vec4(0, 0, -6, 1);
@@ -28,6 +29,8 @@ void main(void) {
     ic = color;
     iL = normalize(V * lp - V * M * vertex);
     iN = normalize(V * M * normal);
+
+    fragPos = normalize(M * normal);
 
     gl_Position = P * V * M * vertex;
 }
