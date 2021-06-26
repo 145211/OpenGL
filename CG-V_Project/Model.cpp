@@ -156,8 +156,6 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 	const aiScene* scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 	std::cout << importer.GetErrorString() << std::endl;
 
-	std::cout << (scene->mNumMeshes) << std::endl;
-
 	aiMesh* mesh;
 
 	for (unsigned int j = 0; j < (scene->mNumMeshes); j++) {
@@ -192,8 +190,9 @@ void Model::assimpLoadModel(std::string fileName) // do dokończenia
 	//	}
 	//}
 	
-	std::cout << indices.size() << std::endl;
-	std::cout << vertexArray.size() << std::endl;
+	std::cout << "No. of vertices: " << vertexArray.size() << std::endl;
+	std::cout << "Loaded model: " << fileName << std::endl;
+
 	
 	// liczenie materiałów
 	//aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
