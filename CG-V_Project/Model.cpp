@@ -142,7 +142,7 @@ void Model::loadModel(const char* fileName)
 	}
 
 	//DEBUG
-	std::cout << "Nr of vertices: " << vertexArray.size() << "\n";
+	//std::cout << "Nr of vertices: " << vertexArray.size() << "\n";
 
 	//Loaded success
 	std::cout << "OBJ file loaded!" << "\n";
@@ -150,38 +150,51 @@ void Model::loadModel(const char* fileName)
 
 void Model::assimpLoadModel(std::string fileName) // do dokończenia
 {
+	vertexArray.reserve(200000);
+
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
 	std::cout << importer.GetErrorString() << std::endl;
 
-	aiMesh* mesh = scene->mMeshes[0];
-	for (int i = 0; i < mesh->mNumVertices; i++) {
-		aiVector3D vertex = mesh->mVertices[i];
-		aiVector3D normal = mesh->mNormals[i];
+	std::cout << (scene->mNumMeshes) << std::endl;
 
-		// liczba zdefiniowanych zestawów wsp. teksturowania (zestawów jest max 8)
-		unsigned int liczba_zest = mesh->GetNumUVChannels();
-		// Liczba składowych wsp. teksturowania dla 0 zestawu
-		unsigned int wymiar_wsp_tex = mesh->mNumUVComponents[0];
-		aiVector3D texCoord = mesh->mTextureCoords[0][i];
-		
-		vertexArray.push_back(Vertex{ 
-			glm::vec4(vertex.x, vertex.y, vertex.z, 1),
-			glm::vec4(1, 1, 1, 1),  
-			glm::vec2(texCoord.x, texCoord.y),
-			glm::vec4(normal.x, normal.y, normal.z, 0) });
-	}
+	aiMesh* mesh;
 
-	// wczytywanie i liczenie faces
-	for (int i = 0; i < mesh->mNumFaces; ++i) {
-		aiFace& face = mesh->mFaces[i];
-		for (int j = 0; j < face.mNumIndices; j++) {
-			indices.push_back(face.mIndices[j]);
-			// tutaj w oryginale indices.push_back(face.mIndices[j]);
+	for (unsigned int j = 0; j < (scene->mNumMeshes); j++) {
+
+		mesh = scene->mMeshes[j];
+
+		for (int i = 0; i < mesh->mNumVertices; i++) {
+			aiVector3D vertex = mesh->mVertices[i];
+			aiVector3D normal = mesh->mNormals[i];
+
+			// liczba zdefiniowanych zestawów wsp. teksturowania (zestawów jest max 8)
+			unsigned int liczba_zest = mesh->GetNumUVChannels();
+			// Liczba składowych wsp. teksturowania dla 0 zestawu
+			unsigned int wymiar_wsp_tex = mesh->mNumUVComponents[0];
+			aiVector3D texCoord = mesh->mTextureCoords[0][i];
+
+			vertexArray.push_back(Vertex{
+				glm::vec4(vertex.x, vertex.y, vertex.z, 1),
+				glm::vec4(1, 1, 1, 1),
+				glm::vec2(texCoord.x, texCoord.y),
+				glm::vec4(normal.x, normal.y, normal.z, 0) });
 		}
 	}
+
+
+	// wczytywanie i liczenie faces
+	//for (int i = 0; i < mesh->mNumFaces; ++i) {
+	//	aiFace& face = mesh->mFaces[i];
+	//	for (int j = 0; j < face.mNumIndices; j++) {
+	//		indices.push_back(face.mIndices[j]);
+	//		// tutaj w oryginale indices.push_back(face.mIndices[j]);
+	//	}
+	//}
+	
 	std::cout << indices.size() << std::endl;
 	std::cout << vertexArray.size() << std::endl;
+	
 	// liczenie materiałów
 	//aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	//for (int i = 0; i < 19; ++i) {

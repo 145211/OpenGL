@@ -43,7 +43,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-glm::vec3 startPos = glm::vec3(10.0f, 3.0f, -60.0f);
+glm::vec3 startPos = glm::vec3(11.5f, 3.0f, -30.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
@@ -226,7 +226,8 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
+	//Obliczanie kolizji z obiektami
+	//moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
 	playerPos += moveVec;
 
 	glm::mat4 V = glm::lookAt(
@@ -238,10 +239,14 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
-
 	(*entities[0]).drawEntity(P, V);
 
+	(*entities[1]).accessModel().setPosition(vec3(0, 1, -10));
 	(*entities[1]).drawEntity(P, V);
+	
+	(*entities[2]).accessModel().setPosition(vec3(20, 1, -10));
+	(*entities[2]).drawEntity(P, V);
+
 
 	//otest.activateShader();
 	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
@@ -314,23 +319,27 @@ int main(void)
 
 	initOpenGLProgram(window); //Operacje inicjujące
 
-	//std::vector<Vertex> vtest = loadOBJ("Pantheon_even_smaller.obj");
-	//std::vector<Vertex> vtest = loadOBJ("Monument_test.obj");
-
-	//Object otest(sp, vtest.data(), (GLuint)vtest.size());
+	// Wczytywanie tekstur
 	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
-	Model model1("Pantheon_even_smaller.obj");
-	Entity otest(tex1, model1, sp);
-	Entity::playerPos = &playerPos;
-
-	entities.push_back(&otest);
-
 	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
-	Model model2("Monument_test.obj");
-	Entity monum(tex2, model2, sp);
-	Entity::playerPos = &playerPos;
+
+	// Wczytywanie modeli assimpem
+	Model model1; 
+	model1.assimpLoadModel("Pantheon_even_smaller.obj");
+	Entity ent1(tex1, model1, sp);
+	entities.push_back(&ent1);
+
+	Model model2;
+	model2.assimpLoadModel("Monument_test.obj");
+	Entity ent2(tex2, model2, sp);
+	entities.push_back(&ent2);
 	
-	entities.push_back(&monum);
+	Model model3;
+	model3.assimpLoadModel("Venus_de_Milo.obj");
+	Entity ent3(tex2, model3, sp);
+	entities.push_back(&ent3);
+
+	Entity::playerPos = &playerPos;
 
 	//Główna pętla
 	float angle_x = 0; //Aktualny kąt obrotu obiektu
@@ -349,7 +358,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 	}
 
 	freeOpenGLProgram(window);

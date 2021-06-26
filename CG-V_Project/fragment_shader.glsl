@@ -31,5 +31,5 @@ void main(void) {
 
 	float nl = clamp(dot(n, l), 0, 1);
 	
-	pixelColor = /*texture(textureMap0, itexCoord)*/ ic * vec4(nl);
+	pixelColor = /*texture(textureMap0, itexCoord)*/ ic * vec4(nl) * ambientLight;
 }
