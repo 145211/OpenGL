@@ -18,7 +18,8 @@
 class Model {
 private:
 	std::vector<Vertex> vertexArray;
-	
+	std::vector<GLuint> indices;
+
 	glm::vec3 position = glm::vec3(0.f);
 	glm::vec3 rotation = glm::vec3(0.f);
 	glm::vec3 scaling = glm::vec3(1.f);
@@ -30,6 +31,7 @@ public:
 
 	void loadModel(const char* fileName);
 	void assimpLoadModel(std::string fileName);
+	//void assimpProcessNode(aiNode* node, const aiScene* scene);
 
 	glm::vec4* getVerticesArray();
 	glm::vec2* getTexCoordsArray();
@@ -37,7 +39,9 @@ public:
 	//glm::vec4* getFacesArray();
 
 	size_t arraySize();
+	size_t indicesSize();
 	Vertex* vertexData();
+	GLuint* indicesData();
 
 	void setPosition(glm::vec3 position);
 	void setRotation(glm::vec3 rotation);

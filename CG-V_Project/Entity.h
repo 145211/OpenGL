@@ -17,7 +17,7 @@ private:
 
 	ShaderProgram* sp;
 
-	GLuint VBO, VAO;
+	GLuint VBO, VAO, EBO;
 	void initBuffers(); // przy inicjowaniu modelu. Tekstura już powinna do tego czasu
 						// posiadać zarezerwowaną i zorganizowaną pamięć
 						// initBuffers powinno jeszcze testować, czy VBO oraz VAO już są utworzone
