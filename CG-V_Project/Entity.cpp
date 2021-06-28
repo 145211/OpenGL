@@ -82,14 +82,14 @@ void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
 	// Prepare model matrix
 	glm::mat4 M = glm::mat4(1.0f);
 	M = glm::translate(M, this->model.getPosition());
+	M = glm::scale(M, this->model.getScaling());
 	M = glm::rotate(M, this->model.getRotation().x, glm::vec3(1.f, 0.f, 0.f));
 	M = glm::rotate(M, this->model.getRotation().y, glm::vec3(0.f, 1.f, 0.f));
 	M = glm::rotate(M, this->model.getRotation().z, glm::vec3(0.f, 0.f, 1.f));
 
 	//Dodaje zly offset
 	//M = glm::translate(M, this->model.getPosition() - this->model.getOrigin());
-	//Wszystko znika
-	//M = glm::scale(M, this->model.getScaling());
+
 
 	// Send uniforms
 	glUniformMatrix4fv(sp->u("M"), 1, false, glm::value_ptr(M));

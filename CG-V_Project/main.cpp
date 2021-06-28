@@ -58,7 +58,7 @@ vector<Entity*> entities;
 
 vector<Collisions> objs;
 
-float ambientPwr = 0.8;
+float ambientPwr = 0.025;
 vec3 lightColor = vec3(1, 0.95, 0.95);
 vec4 ambientLight = vec4(lightColor * ambientPwr, 1);
 
@@ -240,13 +240,20 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
 	(*entities[0]).drawEntity(P, V);
+	(*entities[0]).accessModel().setScaling(vec3(1, 1, 1));
 
 	(*entities[1]).accessModel().setPosition(vec3(0, 1, -10));
+	(*entities[1]).accessModel().setScaling(vec3(1, 1, 1));
 	(*entities[1]).drawEntity(P, V);
 	
 	(*entities[2]).accessModel().setPosition(vec3(20, 1, -10));
+	(*entities[2]).accessModel().setScaling(vec3(1, 1, 1));
 	(*entities[2]).drawEntity(P, V);
 
+	(*entities[3]).accessModel().setPosition(vec3(10, 1.5, -10));
+	(*entities[3]).accessModel().setScaling(vec3(1, 1, 1));
+	(*entities[3]).accessModel().setRotation(vec3(0, angle_x, 0));
+	(*entities[3]).drawEntity(P, V);
 
 	//otest.activateShader();
 	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
@@ -324,18 +331,23 @@ int main(void)
 	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
 
 	// Wczytywanie modeli assimpem
-	Model model1; 
-	model1.assimpLoadModel("Pantheon_even_smaller.obj");
-	Entity ent1(tex1, model1, sp);
-	entities.push_back(&ent1);
+	Model model0; 
+	model0.assimpLoadModel("Pantheon_even_smaller.obj");
+	Entity ent0(tex1, model0, sp);
+	entities.push_back(&ent0);
 
+	Model model1;
+	model1.assimpLoadModel("Monument_test.obj");
+	Entity ent1(tex2, model1, sp);
+	entities.push_back(&ent1);
+	
 	Model model2;
-	model2.assimpLoadModel("Monument_test.obj");
+	model2.assimpLoadModel("Venus_de_Milo.obj");
 	Entity ent2(tex2, model2, sp);
 	entities.push_back(&ent2);
-	
+
 	Model model3;
-	model3.assimpLoadModel("Venus_de_Milo.obj");
+	model3.assimpLoadModel("cube.obj");
 	Entity ent3(tex2, model3, sp);
 	entities.push_back(&ent3);
 
