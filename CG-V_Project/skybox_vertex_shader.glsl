@@ -1,5 +1,5 @@
 #version 330
-layout (location = 0) in vec3 aPos;
+in vec4 vertex;
 
 out vec3 TexCoords;
 
@@ -8,6 +8,6 @@ uniform mat4 V;
 
 void main()
 {
-    TexCoords = aPos;
-    gl_Position = P * V * vec4(aPos, 1.0);
+    TexCoords = vec3(vertex.xyz);
+    gl_Position = P * V * vertex;
 }  

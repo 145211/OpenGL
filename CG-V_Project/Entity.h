@@ -27,6 +27,7 @@ public:
 
 	Entity();
 	Entity(Texture* texture, Model& model, ShaderProgram* sp);
+	Entity(Model& model, ShaderProgram* sp);
 	~Entity();
 
 	void setTexture(Texture* texture);

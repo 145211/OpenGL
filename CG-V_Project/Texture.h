@@ -15,17 +15,25 @@ private:
 	unsigned int height;
 	unsigned int type;
 	GLint textureUnit;
+	bool cubemap = false;
 
 public:
-	Texture(GLint texture_unit, unsigned int type);
+	Texture(GLuint type, GLint texture_unit);
 	Texture(const char* fileName, GLenum type, GLint texture_unit);
 	~Texture();
 
 	void loadTexture(const char* fileName);
-	//void setTextureUnit();
 
+	void loadCubemap(std::vector<std::string> faces);
+	
+	void setTextureUnit(GLint tu);
 
+	bool getType();
+	void setType(unsigned int tp);
+
+	void setTextureID(GLuint texID);
 	GLuint getTextureID() const { return this->id; }
+
 	void bindTexture();
 	void unbindTexture();
 	inline GLint getTextureUnit() const;

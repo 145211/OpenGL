@@ -31,8 +31,8 @@
 #include "myCube.h"
 
 float aspectRatio = 16.f/9.f;
-float movementSpeed = 0.05f;
-float sprint = 0.1f;
+float movementSpeed = 0.08f;
+float sprint = 0.14f;
 float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -54,6 +54,8 @@ float pitch = 0.0f;
 
 ShaderProgram* sp, *skyboxsp;
 
+unsigned int cubemapTexture;
+
 vector<Entity*> entities;
 
 vector<Collisions> objs;
@@ -62,6 +64,13 @@ float ambientPwr = 0.025;
 vec3 lightColor = vec3(1, 0.95, 0.95);
 vec4 ambientLight = vec4(lightColor * ambientPwr, 1);
 
+std::vector<std::string> skyboxFaces{
+	"textures\\skybox\\right.png",
+	"textures\\skybox\\left.png",
+	"textures\\skybox\\top.png",
+	"textures\\skybox\\bottom.png",
+	"textures\\skybox\\front.png",
+	"textures\\skybox\\back.png" };
 
 //Error handling
 void error_callback(int error, const char* description) {
@@ -151,36 +160,36 @@ GLuint readTexture(const char* filename) {
 	return tex;
 }
 
-GLuint loadCubemap(std::vector<std::string> faces)
-{
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-	unsigned width, height;
-	for (unsigned int i = 0; i < faces.size(); i++)
-	{
-		std::vector<unsigned char> image;
-		unsigned error = lodepng::decode(image, width, height, faces[i].c_str());
-		if (image.size())
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data());
-			image.clear();
-		}
-		else
-		{
-			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
-			image.clear();
-		}
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	return textureID;
-}
+//GLuint loadCubemap(std::vector<std::string> faces)
+//{
+//	unsigned int textureID;
+//	glGenTextures(1, &textureID);
+//	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+//
+//	unsigned width, height;
+//	for (unsigned int i = 0; i < faces.size(); i++)
+//	{
+//		std::vector<unsigned char> image;
+//		unsigned error = lodepng::decode(image, width, height, faces[i].c_str());
+//		if (image.size())
+//		{
+//			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+//			image.clear();
+//		}
+//		else
+//		{
+//			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+//			image.clear();
+//		}
+//	}
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//
+//	return textureID;
+//}
 
 //Procedura inicjująca
 void initOpenGLProgram(GLFWwindow* window) {
@@ -195,8 +204,8 @@ void initOpenGLProgram(GLFWwindow* window) {
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 	//tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
-	//skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
-	
+	skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
+
 	sp->use();
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
@@ -210,19 +219,7 @@ void freeOpenGLProgram(GLFWwindow* window) {
 	delete sp;
 }
 
-//Vertex* loadArrayToVertexArray(float* vertices, float* normals, float* colors, float* texCoords, const unsigned arrSize) {
-//	Vertex* varr = new Vertex[arrSize];
-//	for (unsigned i = 0; i < arrSize; ++i) {
-//		varr[i].position = glm::vec4(vertices[4 * i], vertices[4 * i + 1], vertices[4 * i + 2], vertices[4 * i + 3]);
-//		varr[i].normal = glm::vec4(normals[4 * i], normals[4 * i + 1], normals[4 * i + 2], normals[4 * i + 3]);
-//		varr[i].color = glm::vec4(colors[4 * i], colors[4 * i + 1], colors[4 * i + 2], colors[4 * i + 3]);
-//		varr[i].texCoord = glm::vec2(texCoords[2 * i], texCoords[2 * i + 1]);
-//	}
-//
-//	return varr;
-//}
-
-void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, vector<Entity*> entities) {
+void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& playerPos, vector<Entity*> entities, Entity& skybox) {
 	//************Tutaj umieszczaj kod rysujący obraz******************
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -239,21 +236,26 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
-	(*entities[0]).drawEntity(P, V);
-	(*entities[0]).accessModel().setScaling(vec3(1, 1, 1));
+	glDepthMask(GL_FALSE);
+	(*entities[0]).accessModel().setScaling(glm::vec3(1, 1, 1));
+	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)));
+	glDepthMask(GL_TRUE);
 
-	(*entities[1]).accessModel().setPosition(vec3(0, 1, -10));
-	(*entities[1]).accessModel().setScaling(vec3(1, 1, 1));
+	(*entities[1]).accessModel().setScaling(glm::vec3(1, 1, 1));
 	(*entities[1]).drawEntity(P, V);
-	
-	(*entities[2]).accessModel().setPosition(vec3(20, 1, -10));
-	(*entities[2]).accessModel().setScaling(vec3(1, 1, 1));
-	(*entities[2]).drawEntity(P, V);
 
-	(*entities[3]).accessModel().setPosition(vec3(10, 1.5, -10));
-	(*entities[3]).accessModel().setScaling(vec3(1, 1, 1));
-	(*entities[3]).accessModel().setRotation(vec3(0, angle_x, 0));
+	(*entities[2]).accessModel().setPosition(glm::vec3(0, 1, -10));
+	(*entities[2]).accessModel().setScaling(glm::vec3(1, 1, 1));
+	(*entities[2]).drawEntity(P, V);
+	
+	(*entities[3]).accessModel().setPosition(glm::vec3(20, 1, -10));
+	(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
 	(*entities[3]).drawEntity(P, V);
+
+	//(*entities[3]).accessModel().setPosition(glm::vec3(10, 1.5, -10));
+	//(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
+	//(*entities[3]).accessModel().setRotation(glm::vec3(0, angle_x, 0));
+	//(*entities[3]).drawEntity(P, V);
 
 	//otest.activateShader();
 	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
@@ -329,8 +331,15 @@ int main(void)
 	// Wczytywanie tekstur
 	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
 	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
+	Texture* skyboxTex = new Texture(GL_TEXTURE_CUBE_MAP, 0);
+	skyboxTex->loadCubemap(skyboxFaces);
 
 	// Wczytywanie modeli assimpem
+	Model skyboxModel;
+	skyboxModel.assimpLoadModel("cube.obj");
+	Entity skybox(skyboxTex, skyboxModel, skyboxsp);
+	entities.push_back(&skybox);
+
 	Model model0; 
 	model0.assimpLoadModel("Pantheon_even_smaller.obj");
 	Entity ent0(tex1, model0, sp);
@@ -346,11 +355,6 @@ int main(void)
 	Entity ent2(tex2, model2, sp);
 	entities.push_back(&ent2);
 
-	Model model3;
-	model3.assimpLoadModel("cube.obj");
-	Entity ent3(tex2, model3, sp);
-	entities.push_back(&ent3);
-
 	Entity::playerPos = &playerPos;
 
 	//Główna pętla
@@ -363,7 +367,7 @@ int main(void)
 		angle_y += 1 * glfwGetTime(); //Zwiększ/zmniejsz kąt obrotu na podstawie prędkości i czasu jaki upłynał od poprzedniej klatki
 		
 		glfwSetTime(0); //Zeruj timer
-		drawScene(window, angle_x, angle_y, playerPos, entities); //Wykonaj procedurę rysującą
+		drawScene(window, angle_x, angle_y, playerPos, entities, skybox); //Wykonaj procedurę rysującą
 		glfwPollEvents(); //Wykonaj procedury callback w zalezności od zdarzeń jakie zaszły.
 
 		movementKeys();

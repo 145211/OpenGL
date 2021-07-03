@@ -41,6 +41,12 @@ Entity::Entity(Texture* texture, Model& model, ShaderProgram* sp) : texture(text
 	initBuffers();
 }
 
+Entity::Entity(Model& model, ShaderProgram* sp) : sp(sp)
+{
+	this->model = model;
+	initBuffers();
+}
+
 Entity::~Entity()
 {
 	// Delete buffers
