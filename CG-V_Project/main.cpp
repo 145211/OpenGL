@@ -193,8 +193,9 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[2]).accessModel().setScaling(glm::vec3(1, 1, 1));
 	(*entities[2]).drawEntity(P, V);
 	
-	(*entities[3]).accessModel().setPosition(glm::vec3(20, 1, -10));
-	(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
+	(*entities[3]).accessModel().setPosition(glm::vec3(11.85, 1, 24.25));
+	(*entities[3]).accessModel().setScaling(glm::vec3(1.3, 1.3, 1.3));
+	(*entities[3]).accessModel().setRotation(glm::vec3(0, glm::radians(180.0), 0));
 	(*entities[3]).drawEntity(P, V);
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
