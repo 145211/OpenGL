@@ -13,6 +13,7 @@
 class Entity {
 private:
 	Texture* texture;
+	Texture* specular;
 	Model model;
 
 	ShaderProgram* sp;
@@ -26,7 +27,7 @@ public:
 	static glm::vec3* playerPos;
 
 	Entity();
-	Entity(Texture* texture, Model& model, ShaderProgram* sp);
+	Entity(Texture* texture, Texture* specular, Model& model, ShaderProgram* sp);
 	Entity(Model& model, ShaderProgram* sp);
 	~Entity();
 

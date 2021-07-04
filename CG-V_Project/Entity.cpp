@@ -35,7 +35,7 @@ void Entity::initBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-Entity::Entity(Texture* texture, Model& model, ShaderProgram* sp) : texture(texture), sp(sp)
+Entity::Entity(Texture* texture, Texture* specular, Model& model, ShaderProgram* sp) : texture(texture), sp(sp)
 {
 	this->model = model;
 	initBuffers();

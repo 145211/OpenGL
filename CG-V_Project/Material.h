@@ -11,21 +11,16 @@
 #include <glm/mat4x4.hpp>
 
 #include "shaderprogram.h"
+#include "texture.h"
 
 class Material {
 private:
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-	GLint diffuseTex;
-	GLint specularTex;
+	Texture mainTex;
+	Texture diffuseTex;
+	Texture specularTex;
 
 public:
-	Material(glm::vec3 ambient,
-			 glm::vec3 diffuse,
-			 glm::vec3 specular,
-			 GLint diffuseTex,
-			 GLint specularTex);
+	Material(Texture mainTex, Texture diffuseTex, Texture specularTex);
 	~Material();
 
 	void sendToShader(ShaderProgram* sp);

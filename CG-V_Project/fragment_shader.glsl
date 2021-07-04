@@ -25,18 +25,20 @@ in vec2 itexCoord;
 
 void main(void) {
 	//Powierzchnia
-	vec4 kd = texture(textureMap0, itexCoord);
+	vec4 diffTex = texture(textureMap0, itexCoord);
+	vec4 specTex = texture(textureMap0, itexCoord);
 
+	//Attenuation
 	float constant = 1;
 	float linear = 0.09;
 	float quadratic = 0.032;
-
 	float dist = length(iL);
 	float atten = 1 / (constant + linear * dist + quadratic * (dist*dist));
 
-	vec4 mAmbient = kd;
-	vec4 mDiffuse = atten * vec4(0.5) * kd;
-	vec4 mSpecular = atten * vec4(0.5) * kd;
+	//Rodzaje swiatla
+	vec4 mAmbient = diffTex;
+	vec4 mDiffuse = atten * vec4(0.5) * diffTex;
+	vec4 mSpecular = atten * vec4(0.5) * specTex;
 	float mShiny = 25;
 
 	vec4 lightColor = vec4(1, 1, 1, 1);
@@ -56,5 +58,5 @@ void main(void) {
 	//Swiatlo
 	vec4 result = ambient + diffuse + specular;
 
-	pixelColor = vec4(kd.rgb * result.rgb, kd.a);
+	pixelColor = vec4(diffTex.rgb * result.rgb, diffTex.a);
 }

@@ -195,7 +195,11 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	
 	(*entities[3]).accessModel().setPosition(glm::vec3(20, 1, -10));
 	(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
-	(*entities[3]).drawEntity(P, V);
+	(*entities[3]).drawEntity(P, V);	
+	
+	(*entities[4]).accessModel().setPosition(glm::vec3(10, 3, -2));
+	(*entities[4]).accessModel().setScaling(glm::vec3(1, 1, 1));
+	(*entities[4]).drawEntity(P, V);
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
@@ -261,31 +265,40 @@ int main(void)
 	initOpenGLProgram(window); //Operacje inicjujące
 
 	// Wczytywanie tekstur
-	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
-	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
 	Texture* skyboxTex = new Texture(GL_TEXTURE_CUBE_MAP, 0);
 	skyboxTex->loadCubemap(skyboxFaces);
+
+	Texture* tex1  = new Texture("textures\\Red_Marble_002\\COLOR.png", GL_TEXTURE_2D, 0);
+	Texture* spec1 = new Texture("textures\\Red_Marble_002\\SPEC.png", GL_TEXTURE_2D, 1);
+
+	Texture* tex2  = new Texture("textures\\Metal\\COLOR.png", GL_TEXTURE_2D, 0);
+	Texture* spec2 = new Texture("textures\\Metal\\SPEC.png", GL_TEXTURE_2D, 1);
 
 	// Wczytywanie modeli assimpem
 	Model skyboxModel;
 	skyboxModel.assimpLoadModel("cube.obj");
-	Entity skybox(skyboxTex, skyboxModel, skyboxsp);
+	Entity skybox(skyboxTex, skyboxTex, skyboxModel, skyboxsp);
 	entities.push_back(&skybox);
 
 	Model model0; 
 	model0.assimpLoadModel("Pantheon_even_smaller.obj");
-	Entity ent0(tex1, model0, sp);
+	Entity ent0(tex1, spec1, model0, sp);
 	entities.push_back(&ent0);
 
 	Model model1;
 	model1.assimpLoadModel("Monument_test.obj");
-	Entity ent1(tex2, model1, sp);
+	Entity ent1(tex1, spec1, model1, sp);
 	entities.push_back(&ent1);
 	
 	Model model2;
 	model2.assimpLoadModel("Venus_de_Milo.obj");
-	Entity ent2(tex2, model2, sp);
+	Entity ent2(tex2, spec2, model2, sp);
 	entities.push_back(&ent2);
+
+	Model model3;
+	model3.assimpLoadModel("cube.obj");
+	Entity ent3(tex2, spec2, model3, sp);
+	entities.push_back(&ent3);
 
 	Entity::playerPos = &playerPos;
 
