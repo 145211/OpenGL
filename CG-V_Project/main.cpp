@@ -257,8 +257,6 @@ int main(void)
 	initOpenGLProgram(window); //Operacje inicjujące
 
 	// Wczytywanie tekstur
-	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
-	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
 	Texture* skyboxTex = new Texture(GL_TEXTURE_CUBE_MAP, 0);
 	skyboxTex->loadCubemap(skyboxFaces);
 
@@ -281,13 +279,13 @@ int main(void)
 
 	Model model1;
 	model1.assimpLoadModel("Monument_test.obj");
-	Entity ent1(tex2, model1, sp);
+	Entity ent1(tex1, spec1, model1, sp);
 	ent1.accessModel().setPosition(glm::vec3(0, 1, -10));
 	entities.push_back(&ent1);
 	
 	Model model2;
 	model2.assimpLoadModel("Venus_de_Milo.obj");
-	Entity ent2(tex2, model2, sp);
+	Entity ent2(tex1, spec1, model2, sp);
 	ent2.accessModel().setPosition(glm::vec3(11.85, 1, 24.25));
 	ent2.accessModel().setScaling(glm::vec3(1.3, 1.3, 1.3));
 	ent2.accessModel().setRotation(glm::vec3(0, glm::radians(180.0), 0));
@@ -295,7 +293,7 @@ int main(void)
 
 	Model donutM;
 	donutM.assimpLoadModel("donut.obj");
-	Entity donut(bricksT, donutM, sp);
+	Entity donut(tex1, spec1, donutM, sp);
 	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
 	donut.accessModel().setPosition(glm::vec3(11.15, 1.5, -53.7));

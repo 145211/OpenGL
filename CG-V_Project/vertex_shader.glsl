@@ -20,7 +20,7 @@ out vec4 iV; //wektor do obserwatora
 out vec2 itexCoord;
 
 void main(void) {
-	vec4 lp = vec4(12, 5, 5, 1);
+	vec4 lp = vec4(12, 3, 5, 1);
 
     //vec4 lp = normalize(-vec4( -0.2f, -1.0f, -0.3f, 0));
 

@@ -35,7 +35,7 @@ void Entity::initBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-Entity::Entity(Texture* texture, Texture* specular, Model& model, ShaderProgram* sp) : texture(texture), sp(sp)
+Entity::Entity(Texture* texture, Texture* specular, Model& model, ShaderProgram* sp) : texture(texture), specular(specular), sp(sp)
 {
 	this->model = model;
 	initBuffers();
@@ -84,6 +84,7 @@ void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
 
 	// Bind texture
 	this->texture->bindTexture();
+	this->specular->bindTexture();
 
 	// Prepare model matrix
 	glm::mat4 M = glm::mat4(1.0f);
