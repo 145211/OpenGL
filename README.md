@@ -1,9 +1,10 @@
 # CG-V_Project
 
 ### TODO list
+- [x] Skybox / Paweł
 - [x] Kamera FPS / Paweł
-- [ ] Poruszanie się w przestrzeni / Prawie
-- [ ] Kolizje
+- [x] Poruszanie się w przestrzeni / Wiktor/Paweł
+- [ ] Kolizje / Wiktor
 - [x] Import modeli / Paweł
 - [x] Import tekstur / Paweł
 - [ ] Rozmieszczenie elementów na mapie
