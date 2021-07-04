@@ -136,61 +136,6 @@ void windowResizeCallback(GLFWwindow* window, int width, int height) {
 	aspectRatio = (float)width / (float)height;
 	glViewport(0, 0, width, height);
 }
-
-GLuint readTexture(const char* filename) {
-	GLuint tex;
-	glActiveTexture(GL_TEXTURE0);
-
-	//Load into computer's memory
-	std::vector<unsigned char> image;   //Allocate a vector for image storage
-	unsigned width, height;   //Variables for image size
-	//Read image
-	unsigned error = lodepng::decode(image, width, height, filename);
-
-	//Import into graphics card's memory
-	glGenTextures(1, &tex); //Initialize one handle
-	glBindTexture(GL_TEXTURE_2D, tex); //Activate the handle
-	//Import image into graphics card's memory associated with the handle
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	return tex;
-}
-
-//GLuint loadCubemap(std::vector<std::string> faces)
-//{
-//	unsigned int textureID;
-//	glGenTextures(1, &textureID);
-//	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-//
-//	unsigned width, height;
-//	for (unsigned int i = 0; i < faces.size(); i++)
-//	{
-//		std::vector<unsigned char> image;
-//		unsigned error = lodepng::decode(image, width, height, faces[i].c_str());
-//		if (image.size())
-//		{
-//			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data());
-//			image.clear();
-//		}
-//		else
-//		{
-//			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
-//			image.clear();
-//		}
-//	}
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-//
-//	return textureID;
-//}
-
 //Procedura inicjująca
 void initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który należy wykonać raz, na początku programu************
