@@ -24,6 +24,10 @@ private:
 						// initBuffers powinno jeszcze testować, czy VBO oraz VAO już są utworzone
 						// i usuwać jeżeli są już wykorzystywane przed ponowną alokacją.
 public:
+	static enum drawType {
+		NORMAL = 0, INSTANCED = 1
+	};
+
 	static glm::vec3* playerPos;
 
 	Entity();
@@ -35,7 +39,7 @@ public:
 	void setModel(Model& model);
 	void setShader(ShaderProgram* sp);
 
-	void drawEntity(glm::mat4 P, glm::mat4 V);
+	void drawEntity(glm::mat4 P, glm::mat4 V, Entity::drawType dType);
 	
 	Texture* accessTexturePointer();
 	Model& accessModel();

@@ -47,12 +47,10 @@ glm::vec3 startPos = glm::vec3(11.5f, 3.0f, -30.0f);
 glm::vec3 playerPos = startPos;
 glm::vec3 moveVec = glm::vec3(0.0f);
 
-//Texture tex(0, GL_TEXTURE_2D);
-
 float yaw = 90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 float pitch = 0.0f;
 
-ShaderProgram* sp, *skyboxsp;
+ShaderProgram* sp, *skyboxsp, *terrainsp;
 
 unsigned int cubemapTexture;
 
@@ -93,6 +91,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		if (key == GLFW_KEY_W) pressedKeys[2] = 0;
 		if (key == GLFW_KEY_S) pressedKeys[3] = 0;
 		if (key == GLFW_KEY_LEFT_SHIFT) movementSpeed -= sprint;
+		if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, 1);
 	}
 }
 
@@ -150,11 +149,15 @@ void initOpenGLProgram(GLFWwindow* window) {
 	//tex.loadTexture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png");
 	sp = new ShaderProgram("vertex_shader.glsl", NULL, "fragment_shader.glsl");
 	skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
+	terrainsp = new ShaderProgram("grass_vertex_shader.glsl", NULL, "grass_fragment_shader.glsl");
 
 	sp->use();
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
 	objs = collisionInit(objs);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 //Zwolnienie zasobów zajętych przez program
@@ -192,18 +195,21 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	sp->set1f(0.032, "pointLights[1].quadratic");
 
 	glDepthMask(GL_FALSE);
-	//(*entities[0]).accessModel().setScaling(glm::vec3(1, 1, 1));
-	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)));
+	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)), Entity::drawType::NORMAL);
 	glDepthMask(GL_TRUE);
 
-	(*entities[1]).drawEntity(P, V); // Świątynia
-	(*entities[2]).drawEntity(P, V); // Test
-	(*entities[3]).drawEntity(P, V); // Venus
-	(*entities[4]).drawEntity(P, V); // Donut
+	(*entities[1]).drawEntity(P, V, Entity::drawType::NORMAL); // Świątynia
+	(*entities[2]).drawEntity(P, V, Entity::drawType::NORMAL); // Test
+	(*entities[3]).drawEntity(P, V, Entity::drawType::NORMAL); // Venus
+	(*entities[4]).drawEntity(P, V, Entity::drawType::NORMAL); // Donut
 	(*entities[4]).accessModel().rotate(glm::vec3(0, glm::radians(1.0), 0));
+	
+	(*entities[5]).drawEntity(P, V, Entity::drawType::INSTANCED); // Terrain
 	//(*entities[3]).accessModel().rotate(glm::vec3(0, glm::radians(10.0), 0));
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
+
+
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
@@ -276,6 +282,11 @@ int main(void)
 	Texture* tex2  = new Texture("textures\\Metal\\COLOR.png", GL_TEXTURE_2D, 0);
 	Texture* spec2 = new Texture("textures\\Metal\\SPEC.png", GL_TEXTURE_2D, 1);
 
+	Texture* VenusT = new Texture("Venus_de_Milo.png", GL_TEXTURE_2D, 0);
+	Texture* terrainT = new Texture("textures\\grass.png", GL_TEXTURE_2D, 0);
+
+	Texture* randomMap = new Texture("random_map.png", GL_TEXTURE_2D, 1);
+
 	// Wczytywanie modeli assimpem
 	Model skyboxModel;
 	skyboxModel.assimpLoadModel("cube.obj");
@@ -295,7 +306,7 @@ int main(void)
 	
 	Model model2;
 	model2.assimpLoadModel("Venus_de_Milo.obj");
-	Entity ent2(tex1, spec1, model2, sp);
+	Entity ent2(VenusT, spec1, model2, sp);
 	ent2.accessModel().setPosition(glm::vec3(11.85, 1, 24.25));
 	ent2.accessModel().setScaling(glm::vec3(1.3, 1.3, 1.3));
 	ent2.accessModel().setRotation(glm::vec3(0, glm::radians(180.0), 0));
@@ -308,6 +319,14 @@ int main(void)
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
 	donut.accessModel().setPosition(glm::vec3(11.15, 1.5, -53.7));
 	entities.push_back(&donut);
+
+	Model terrainM;
+	terrainM.assimpLoadModel("terrain.obj");
+	Entity terrain(terrainT, randomMap, terrainM, terrainsp);
+	terrain.accessModel().setRotation(glm::vec3(0, 0, glm::radians(180.0)));
+	terrain.accessModel().setPosition(glm::vec3(0, -2.2, 0));
+	terrain.accessModel().setScaling(glm::vec3(2, 3, 3));
+	entities.push_back(&terrain);
 
 	Entity::playerPos = &playerPos;
 
@@ -328,7 +347,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 	}
 
 	freeOpenGLProgram(window);

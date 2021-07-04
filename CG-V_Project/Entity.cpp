@@ -72,7 +72,7 @@ void Entity::setShader(ShaderProgram* sp)
 	this->sp = sp;
 }
 
-void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
+void Entity::drawEntity(glm::mat4 P, glm::mat4 V, Entity::drawType dType)
 {
 	// Enable shader program
 	this->sp->use();
@@ -105,6 +105,12 @@ void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
 
 	glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(*playerPos));
 
+	glUniform1i(sp->u("textureMap0"), 0);
+	glUniform1i(sp->u("textureMap1"), 1);
+
+	glUniform1f(sp->u("maxLength"), 0.1);
+	glUniform1f(sp->u("maxLayer"), 5);
+
 	// Enable vertex attributes
 	glEnableVertexAttribArray(this->sp->a("vertex"));
 	glEnableVertexAttribArray(this->sp->a("color"));
@@ -112,11 +118,13 @@ void Entity::drawEntity(glm::mat4 P, glm::mat4 V)
 	glEnableVertexAttribArray(this->sp->a("normal"));
 
 	// Draw arrays
-	glDrawArrays(GL_TRIANGLES, 0, this->model.arraySize());
+	if (dType == drawType::NORMAL) glDrawArrays(GL_TRIANGLES, 0, this->model.arraySize());
+	if (dType == drawType::INSTANCED) glDrawArraysInstanced(GL_TRIANGLES, 0, this->model.arraySize(), 10);
 	//glDrawElements(GL_TRIANGLES, model.indicesSize(), GL_UNSIGNED_INT, 0);
 
 	// Cleanup
 	this->texture->unbindTexture();
+	this->specular->unbindTexture();
 	glDisableVertexAttribArray(this->sp->a("vertex"));
 	glDisableVertexAttribArray(this->sp->a("color"));
 	glDisableVertexAttribArray(this->sp->a("texCoord"));
