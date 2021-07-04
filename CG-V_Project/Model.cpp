@@ -1,6 +1,6 @@
 ﻿#include "model.h"
 
-Model::Model() : position(glm::vec3(0.f)), rotation(glm::vec3(0.f)), scaling(glm::vec3(0.f)), origin(glm::vec3(0.f))
+Model::Model() : position(glm::vec3(0.f)), rotation(glm::vec3(0.f)), scaling(glm::vec3(1.f)), origin(glm::vec3(0.f))
 {
 
 }
