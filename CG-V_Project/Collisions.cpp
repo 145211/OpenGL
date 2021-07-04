@@ -114,7 +114,7 @@ vector<Collisions> collisionInit(vector<Collisions> objs) {
 	objs = squareArray(vec2(8.25, 39), vec2(8.25, 9.65), 4, 1.5, objs);
 	objs = squareArray(vec2(15.15, 39), vec2(15.15, 9.65), 4, 1.5, objs);
 
-	//objs.push_back(diagonal(vec2(20, -49.5), vec2(18, -46), vec2(26.5, -41.5)));
+	objs.push_back(diagonal(vec2(20, -49.5), vec2(18, -46), vec2(26.5, -41.5)));
 
 	return objs;
 };

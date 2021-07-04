@@ -15,20 +15,17 @@ uniform vec3 playerPos; //pozycja gracza
 
 //Zmienne interpolowane
 out vec4 iN;
-out vec4 iL; //wektor do światla
+out vec4 iL[2];  
 out vec4 iV; //wektor do obserwatora
 out vec2 itexCoord;
 
 void main(void) {
-	vec4 lp = vec4(12, 3, 5, 1);
-
-    //vec4 lp = normalize(-vec4( -0.2f, -1.0f, -0.3f, 0));
+    vec4 lp[2] = vec4[2]( vec4(4.3, 2, -0.8, 1), vec4(19.3, 3, -0.8, 1) );
 
     itexCoord = texCoord;
 
-    //iL = V * lp;
-
-    iL = V * lp - V * M * vertex;
+    iL[0] = V * lp[0] - V * M * vertex;
+    iL[1] = V * lp[1] - V * M * vertex;
 
     iN = V * M * normal; 
 

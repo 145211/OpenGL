@@ -181,6 +181,16 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
+	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0f), "pointLights[0].lightColor");
+	sp->set1f(1, "pointLights[0].constant");
+	sp->set1f(0.09, "pointLights[0].linear");
+	sp->set1f(0.032, "pointLights[0].quadratic");
+
+	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0f), "pointLights[1].lightColor");
+	sp->set1f(1, "pointLights[1].constant");
+	sp->set1f(0.09, "pointLights[1].linear");
+	sp->set1f(0.032, "pointLights[1].quadratic");
+
 	glDepthMask(GL_FALSE);
 	//(*entities[0]).accessModel().setScaling(glm::vec3(1, 1, 1));
 	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)));
@@ -318,7 +328,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 	}
 
 	freeOpenGLProgram(window);
