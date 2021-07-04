@@ -189,6 +189,8 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[1]).drawEntity(P, V); // Świątynia
 	(*entities[2]).drawEntity(P, V); // Test
 	(*entities[3]).drawEntity(P, V); // Venus
+	(*entities[4]).drawEntity(P, V); // Donut
+	(*entities[4]).accessModel().rotate(glm::vec3(0, glm::radians(1.0), 0));
 	//(*entities[3]).accessModel().rotate(glm::vec3(0, glm::radians(10.0), 0));
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
@@ -285,6 +287,14 @@ int main(void)
 	ent2.accessModel().setScaling(glm::vec3(1.3, 1.3, 1.3));
 	ent2.accessModel().setRotation(glm::vec3(0, glm::radians(180.0), 0));
 	entities.push_back(&ent2);
+
+	Model donutM;
+	donutM.assimpLoadModel("donut.obj");
+	Entity donut(tex2, donutM, sp);
+	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
+	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
+	donut.accessModel().setPosition(glm::vec3(11.15, 1.5, -53.7));
+	entities.push_back(&donut);
 
 	Entity::playerPos = &playerPos;
 
