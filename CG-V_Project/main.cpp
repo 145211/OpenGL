@@ -260,6 +260,7 @@ int main(void)
 	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
 	//Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
 	Texture* tex2 = new Texture("Venus_de_Milo.png", GL_TEXTURE_2D, 0);
+	Texture* bricksT = new Texture("textures\\Bricks\\Brick_v.png", GL_TEXTURE_2D, 0);
 	Texture* skyboxTex = new Texture(GL_TEXTURE_CUBE_MAP, 0);
 	skyboxTex->loadCubemap(skyboxFaces);
 
@@ -290,7 +291,7 @@ int main(void)
 
 	Model donutM;
 	donutM.assimpLoadModel("donut.obj");
-	Entity donut(tex2, donutM, sp);
+	Entity donut(bricksT, donutM, sp);
 	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
 	donut.accessModel().setPosition(glm::vec3(11.15, 1.5, -53.7));
