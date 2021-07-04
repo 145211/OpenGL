@@ -197,20 +197,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
 	(*entities[3]).drawEntity(P, V);
 
-	//(*entities[3]).accessModel().setPosition(glm::vec3(10, 1.5, -10));
-	//(*entities[3]).accessModel().setScaling(glm::vec3(1, 1, 1));
-	//(*entities[3]).accessModel().setRotation(glm::vec3(0, angle_x, 0));
-	//(*entities[3]).drawEntity(P, V);
-
-	//otest.activateShader();
-	//glUniformMatrix4fv(sp->u("V"), 1, false, glm::value_ptr(V));
-	//glUniformMatrix4fv(sp->u("P"), 1, false, glm::value_ptr(P));
-
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
-
-	////otest.setRotation(glm::vec3(angle_x, angle_y, 0));
-	//tex.bindTexture();
-	//otest.render();
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
