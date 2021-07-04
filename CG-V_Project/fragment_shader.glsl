@@ -35,8 +35,8 @@ void main(void) {
 	float atten = 1 / (constant + linear * dist + quadratic * (dist*dist));
 
 	vec4 mAmbient = kd;
-	vec4 mDiffuse = atten * vec4(0.5) * kd;
-	vec4 mSpecular = atten * vec4(0.5) * kd;
+	vec4 mDiffuse = /*atten **/ vec4(0.5) * kd;
+	vec4 mSpecular = /*atten **/ vec4(0.5) * kd;
 	float mShiny = 25;
 
 	vec4 lightColor = vec4(1, 1, 1, 1);

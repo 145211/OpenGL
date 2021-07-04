@@ -186,22 +186,17 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)));
 	glDepthMask(GL_TRUE);
 
-	//(*entities[1]).accessModel().setScaling(glm::vec3(1, 1, 1));
-	(*entities[1]).drawEntity(P, V);
-
-	//(*entities[2]).accessModel().setPosition(glm::vec3(0, 1, -10));
-	//(*entities[2]).accessModel().setScaling(glm::vec3(1, 1, 1));
-	(*entities[2]).drawEntity(P, V);
-	
-
-	(*entities[3]).drawEntity(P, V);
+	(*entities[1]).drawEntity(P, V); // Świątynia
+	(*entities[2]).drawEntity(P, V); // Test
+	(*entities[3]).drawEntity(P, V); // Venus
+	//(*entities[3]).accessModel().rotate(glm::vec3(0, glm::radians(10.0), 0));
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
 
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
 
-void floorLevel(){
+void floorLevel(){	
 	if (playerPos.z > -2.5)
 		playerPos.y = 3;
 	else if (playerPos.z > -4.5)
@@ -261,7 +256,8 @@ int main(void)
 
 	// Wczytywanie tekstur
 	Texture* tex1 = new Texture("textures\\Red_Marble_002\\Red_Marble_002_COLOR.png", GL_TEXTURE_2D, 0);
-	Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
+	//Texture* tex2 = new Texture("textures\\Marble_White_006_SD\\Marble_White_006_basecolor.png", GL_TEXTURE_2D, 0);
+	Texture* tex2 = new Texture("Venus_de_Milo.png", GL_TEXTURE_2D, 0);
 	Texture* skyboxTex = new Texture(GL_TEXTURE_CUBE_MAP, 0);
 	skyboxTex->loadCubemap(skyboxFaces);
 

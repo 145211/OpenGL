@@ -262,6 +262,12 @@ void Model::setScaling(glm::vec3 scaling)
 	this->scaling = scaling;
 }
 
+void Model::rotate(glm::vec3 rotation)
+{
+	this->rotation += rotation;
+	//this->rotation = glm::vec3(this->rotation.x - this->rotation.x / 3.141592, this->rotation.y - this->rotation.y / 3.141592, this->rotation.z - this->rotation.z / 3.141592);
+}
+
 glm::vec3 Model::getPosition() const
 {
 	return this->position;

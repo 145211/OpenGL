@@ -47,6 +47,8 @@ public:
 	void setRotation(glm::vec3 rotation);
 	void setScaling(glm::vec3 scaling);
 
+	void rotate(glm::vec3 rotation);
+
 	glm::vec3 getPosition() const;
 	glm::vec3 getRotation() const;
 	glm::vec3 getScaling() const;
