@@ -206,6 +206,10 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[4]).accessModel().rotate(glm::vec3(0, glm::radians(1.0), 0));
 	
 	(*entities[5]).drawEntity(P, V, Entity::drawType::INSTANCED); // Terrain
+	(*entities[6]).drawEntity(P, V, Entity::drawType::NORMAL); // Vase 1
+	(*entities[6]).accessModel().rotate(glm::vec3(0, glm::radians(-0.5), 0));
+	(*entities[7]).drawEntity(P, V, Entity::drawType::NORMAL); // Vase 2
+	(*entities[7]).accessModel().rotate(glm::vec3(0, glm::radians(0.5), 0));
 	//(*entities[3]).accessModel().rotate(glm::vec3(0, glm::radians(10.0), 0));
 
 	//glUniform3fv(sp->u("playerPos"), 1, glm::value_ptr(playerPos));
@@ -288,6 +292,8 @@ int main(void)
 
 	Texture* randomMap = new Texture("random_map.png", GL_TEXTURE_2D, 1);
 
+	Texture* vaseT = new Texture("textures\\vase.png", GL_TEXTURE_2D, 0);
+
 	// Wczytywanie modeli assimpem
 	Model skyboxModel;
 	skyboxModel.assimpLoadModel("cube.obj");
@@ -328,6 +334,16 @@ int main(void)
 	terrain.accessModel().setPosition(glm::vec3(0, -2.2, 0));
 	terrain.accessModel().setScaling(glm::vec3(2, 3, 3));
 	entities.push_back(&terrain);
+
+	Model vaseM;
+	vaseM.assimpLoadModel("vase.obj");
+	Entity vase1(vaseT, spec1, vaseM, sp);
+	Entity vase2(vaseT, spec1, vaseM, sp);
+	vase1.accessModel().setPosition(glm::vec3(4.3, 0.2, 19.5));
+	vase2.accessModel().setPosition(glm::vec3(18.7, 0.2, 19.5));
+	//vase1.accessModel().setScaling(glm::vec3(1, 1, 1));
+	entities.push_back(&vase1);
+	entities.push_back(&vase2);
 
 	Entity::playerPos = &playerPos;
 
