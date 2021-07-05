@@ -10,7 +10,7 @@ struct PointLight {
     float quadratic;  
 };  
 
-#define noPointLights 5
+#define noPointLights 6
 uniform PointLight pointLights[noPointLights];
 
 //Zmienne jednorodne

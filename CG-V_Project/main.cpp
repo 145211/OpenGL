@@ -63,7 +63,7 @@ float pwr = 0.05;
 
 vec3 attenuation = vec3(1.0, 0.14, 0.07);
 
-#define noPointLights 5
+#define noPointLights 6
 
 vec4 lp[noPointLights] = {
 	vec4(4.3, 2, -0.8, 1),
@@ -71,6 +71,8 @@ vec4 lp[noPointLights] = {
 
 	vec4(18.5, 2, 24.25, 1),
 	vec4(4.5, 2, 24.25, 1),
+
+	vec4(11.15, 0.25, -52.9, 1),
 
 	vec4(playerPos, 1)
 };
@@ -193,9 +195,8 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
 	sp->setVec4f(vec4(cameraFront, 0.0), "camFront");
-	sp->set1f(glm::cos(glm::radians(12.5f)), "cutoff");
-	//sp->set1f(ambientPwr, "outerCutoff");
-
+	sp->set1f(glm::cos(glm::radians(5.0f)), "cutoff");
+	sp->set1f(glm::cos(glm::radians(15.0f)), "outerCutoff");
 
 	sp->set1f(ambientPwr, "dirLight.ambientPwr");
 	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), "dirLight.ambientColor");
@@ -203,7 +204,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	sp->setVec4f(vec4(0.5, 0.5, 0.85, 1.0), "dirLight.lightColor");
 	sp->setVec4f(vec4(-0.1, -1.0, -0.1, 1.0), "dirLight.direction");
 
-	for (int i = 0; i < noPointLights; i++)
+	for (int i = 0; i < noPointLights - 1; i++)
 	{
 		sp->setVec4f(lp[i], ("pointLights[" + std::to_string(i) + "].pos").c_str());
 
@@ -213,7 +214,11 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 		sp->set1f(attenuation[2], ("pointLights[" + std::to_string(i) + "].quadratic").c_str());
 	}
 
-	sp->setVec4f(vec4(0, 1, 0, 1.0), ("pointLights[" + std::to_string(noPointLights - 1) + "].lightColor").c_str());
+	//Fleshlight color
+	sp->setVec4f(vec4(1, 1, 0.9, 1.0), ("pointLights[" + std::to_string(noPointLights - 1) + "].lightColor").c_str());
+	sp->set1f(1.0, ("pointLights[" + std::to_string(noPointLights - 1) + "].constant").c_str());
+	sp->set1f(0.045, ("pointLights[" + std::to_string(noPointLights - 1) + "].linear").c_str());
+	sp->set1f(0.0075, ("pointLights[" + std::to_string(noPointLights - 1) + "].quadratic").c_str());
 
 	glDepthMask(GL_FALSE);
 	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)), Entity::drawType::NORMAL);
@@ -223,7 +228,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	(*entities[2]).drawEntity(P, V, Entity::drawType::NORMAL); // Test
 	(*entities[3]).drawEntity(P, V, Entity::drawType::NORMAL); // Venus
 	(*entities[4]).drawEntity(P, V, Entity::drawType::NORMAL); // Donut
-	(*entities[4]).accessModel().rotate(glm::vec3(0, glm::radians(1.0), 0));
+	(*entities[4]).accessModel().rotate(glm::vec3(glm::radians(0.5), glm::radians(1.0), glm::radians(0.25)));
 	
 	(*entities[5]).drawEntity(P, V, Entity::drawType::INSTANCED); // Terrain
 	(*entities[6]).drawEntity(P, V, Entity::drawType::NORMAL); // Vase 1
@@ -344,7 +349,7 @@ int main(void)
 	Entity donut(tex1, spec1, donutM, sp);
 	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
-	donut.accessModel().setPosition(glm::vec3(11.15, 1.5, -53.7));
+	donut.accessModel().setPosition(glm::vec3(11.15, 2, -53.7));
 	entities.push_back(&donut);
 
 	Model terrainM;
@@ -384,8 +389,8 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
-		printf("%f, %f, %f\n", cameraFront.x, cameraFront.y, cameraFront.z);
+		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		//printf("%f, %f, %f\n", cameraFront.x, cameraFront.y, cameraFront.z);
 	}
 
 	freeOpenGLProgram(window);

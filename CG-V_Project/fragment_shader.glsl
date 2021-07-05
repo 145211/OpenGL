@@ -21,7 +21,7 @@ struct PointLight {
     float quadratic;   
 };  
 
-#define noPointLights 5
+#define noPointLights 6
 uniform PointLight pointLights[noPointLights];
 
 uniform sampler2D textureMap0;
@@ -82,16 +82,15 @@ vec4 point(PointLight PL, vec4 norm, vec4 view, vec4 il, vec4 DT, vec4 ST, float
     return PL.lightColor * (specular + diffuse);
 }
 
-vec4 torch(vec4 res, float cutoff, float outerCutoff, vec4 frag, vec4 cam)
+vec4 torch(vec4 res, float cut, float outerCut, vec4 frag, vec4 cam)
 {
     float theta = dot(cam, -frag);
+    float epsilon   = cut - outerCut;
+    float intensity = smoothstep(0.0, 1.0, (theta - outerCut) / epsilon); 
 
-    float epsilon   = cutoff - outerCutoff;
-    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0); 
-
-    if(theta > cutoff) 
+    if(theta > outerCut) 
     {       
-        return res;
+        return res * intensity;
     }
     else
         return vec4(0);
@@ -118,7 +117,7 @@ void main(void) {
 
     vec4 flashlight = point(pointLights[noPointLights - 1], normal, viewDir, iL[noPointLights - 1], diffTex, specTex,  mShiny);
 
-    result = torch(flashlight, cutoff, 0, viewDir, camera);
+    result += torch(flashlight, cutoff, outerCutoff, viewDir, camera);
 
 	pixelColor = vec4(diffTex.rgb * result.rgb, diffTex.a);
 }
