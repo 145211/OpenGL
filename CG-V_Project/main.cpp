@@ -364,7 +364,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 	}
 
 	freeOpenGLProgram(window);

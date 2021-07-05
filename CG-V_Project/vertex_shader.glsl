@@ -19,16 +19,24 @@ out vec4 iL[3];
 out vec4 iV; //wektor do obserwatora
 out vec2 itexCoord;
 
+#define NR_POINT_LIGHTS 3  
+
 void main(void) {
-    vec4 lp[3] = vec4[3]( vec4(4.3, 2, -0.8, 1), vec4(19.3, 3, -0.8, 1), vec4(10, 1.5, -50, 1) );
+    // pozycje swiatel
+    vec4 lp[NR_POINT_LIGHTS] = vec4[NR_POINT_LIGHTS]( 
+    vec4(4.3, 2, -0.8, 1), 
+    vec4(19.3, 3, -0.8, 1), 
+    vec4(10, 1.5, -50, 1) 
+    );
+
+    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+    {
+        iL[i] = V * lp[i] - V * M * vertex;
+    }
 
     itexCoord = texCoord;
 
-    iL[0] = V * lp[0] - V * M * vertex;
-    iL[1] = V * lp[1] - V * M * vertex;
-    iL[2] = V * lp[2] - V * M * vertex;
-
-    iN = V * M * normal; 
+    iN = V * M * normal;
 
     iV = vec4(0,0,0,1) - V * M * vertex; 
 
