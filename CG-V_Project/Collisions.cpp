@@ -100,6 +100,15 @@ vector<Collisions> squareArray(vec2 start, vec2 end, float ammount, float side, 
 	return objs;
 };
 
+vector<Collisions> square(vec2 pos, float side, vector<Collisions> objs) {
+	vector<vec2> corns;
+
+	corns = corners(pos, side);
+	objs.push_back(Collisions(corns[0], corns[1], corns[2], corns[3]));
+
+	return objs;
+};
+
 Collisions diagonal(vec2 A, vec2 B, vec2 C) {
 	return Collisions(A, B, C, (A + C) - B);
 }
@@ -114,7 +123,22 @@ vector<Collisions> collisionInit(vector<Collisions> objs) {
 	objs = squareArray(vec2(8.25, 39), vec2(8.25, 9.65), 4, 1.5, objs);
 	objs = squareArray(vec2(15.15, 39), vec2(15.15, 9.65), 4, 1.5, objs);
 
-	objs.push_back(diagonal(vec2(20, -49.5), vec2(18, -46), vec2(26.5, -41.5)));
+	//venus
+	objs = square(vec2(12, 24), 4, objs);
+
+	//donut
+	objs = square(vec2(11.15, -52.9), 4, objs);
+
+	//czary
+	objs = square(vec2(4.3, -0.8), 2, objs);
+	objs = square(vec2(19.3, -0.8), 2, objs);
+
+	objs = square(vec2(4.3, 24.2), 2, objs);
+	objs = square(vec2(18.5, 24.2), 2, objs);
+
+	//vase
+	objs = square(vec2(4.3, 19.5), 2, objs);
+	objs = square(vec2(19.2, 19.5), 2, objs);
 
 	return objs;
 };

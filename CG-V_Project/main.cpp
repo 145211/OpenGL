@@ -36,6 +36,7 @@ float sprint = 0.14f;
 float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
+float torch = glm::cos(glm::radians(15.0f));
 
 glm::vec4 pressedKeys = glm::vec4(0,0,0,0);
 
@@ -99,6 +100,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		if (key == GLFW_KEY_S) pressedKeys[3] = 1;
 		if (key == GLFW_KEY_R) playerPos = startPos;
 		if (key == GLFW_KEY_LEFT_SHIFT) movementSpeed += sprint;
+		if (key == GLFW_KEY_T)
+				torch = torch != 1 ? 1 : glm::cos(glm::radians(15.0f));
 	}
 	if (action == GLFW_RELEASE) {
 		if (key == GLFW_KEY_A) pressedKeys[0] = 0;
@@ -196,7 +199,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	sp->setVec4f(vec4(cameraFront, 0.0), "camFront");
 	sp->set1f(glm::cos(glm::radians(5.0f)), "cutoff");
-	sp->set1f(glm::cos(glm::radians(15.0f)), "outerCutoff");
+	sp->set1f(torch, "outerCutoff");
 
 	sp->set1f(ambientPwr, "dirLight.ambientPwr");
 	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), "dirLight.ambientColor");
@@ -349,7 +352,7 @@ int main(void)
 	Entity donut(tex1, spec1, donutM, sp);
 	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
-	donut.accessModel().setPosition(glm::vec3(11.15, 2, -53.7));
+	donut.accessModel().setPosition(glm::vec3(11.15, 2, -53));
 	entities.push_back(&donut);
 
 	Model terrainM;
@@ -362,10 +365,10 @@ int main(void)
 
 	Model vaseM;
 	vaseM.assimpLoadModel("vase.obj");
-	Entity vase1(vaseT, spec1, vaseM, sp);
-	Entity vase2(vaseT, spec1, vaseM, sp);
+	Entity vase1(vaseT, vaseT, vaseM, sp);
+	Entity vase2(vaseT, vaseT, vaseM, sp);
 	vase1.accessModel().setPosition(glm::vec3(4.3, 0.2, 19.5));
-	vase2.accessModel().setPosition(glm::vec3(18.7, 0.2, 19.5));
+	vase2.accessModel().setPosition(glm::vec3(19.3, 0.2, 19.5));
 	//vase1.accessModel().setScaling(glm::vec3(1, 1, 1));
 	entities.push_back(&vase1);
 	entities.push_back(&vase2);
