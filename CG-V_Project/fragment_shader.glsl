@@ -25,9 +25,7 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 struct Flashlight {    
     vec4 lightColor;
 
-    float constant;
-    float linear;
-    float quadratic;  
+    float cutoff;
 };  
 
 uniform sampler2D textureMap0;
@@ -83,6 +81,14 @@ vec4 point(PointLight PL, vec4 il, vec4 DT, vec4 ST, vec4 norm, float mShiny)
 
     return PL.lightColor * (diffuse + specular);
 }
+
+//vec4 spot(Flashlight FL, vec4 lightPos, vec4 lightDir, vec4 DT, vec4 ST, vec4 norm, float mShiny)
+//{
+//    float theta = dot(lightDir, normalize(-lightDir));
+//
+//
+//    return vec4(0);
+//}
 
 void main(void) {
 	//Powierzchnia
