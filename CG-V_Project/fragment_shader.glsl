@@ -12,31 +12,31 @@ struct DirLight {
 uniform DirLight dirLight;
 
 struct PointLight {    
+    vec4 pos;
+    
     vec4 lightColor;
 
     float constant;
     float linear;
-    float quadratic;  
+    float quadratic;   
 };  
 
-#define NR_POINT_LIGHTS 3  
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-
-struct Flashlight {    
-    vec4 lightColor;
-
-    float cutoff;
-};  
+#define noPointLights 5
+uniform PointLight pointLights[noPointLights];
 
 uniform sampler2D textureMap0;
 uniform sampler2D textureMap1;
+
+uniform vec4 camFront;
+uniform float cutoff;
+uniform float outerCutoff;
 
 uniform vec3 playerPos;
 
 out vec4 pixelColor; //Zmienna wyjsciowa fragment shadera. Zapisuje sie do niej ostateczny (prawie) kolor piksela
 
 in vec4 iN; 
-in vec4 iL[NR_POINT_LIGHTS]; 
+in vec4 iL[noPointLights]; 
 in vec4 iV; 
 in vec2 itexCoord;
 
@@ -58,7 +58,7 @@ vec4 CalcDirLight(DirLight light, vec4 norm, vec4 viewDir, vec4 DT, vec4 ST, flo
     return (ambient + diffuse);
 }  
 
-vec4 point(PointLight PL, vec4 il, vec4 DT, vec4 ST, vec4 norm, float mShiny)
+vec4 point(PointLight PL, vec4 norm, vec4 il, vec4 DT, vec4 ST, float mShiny)
 {
 	//Attenuation
 	float dist = length(il);
@@ -82,13 +82,21 @@ vec4 point(PointLight PL, vec4 il, vec4 DT, vec4 ST, vec4 norm, float mShiny)
     return PL.lightColor * (diffuse + specular);
 }
 
-//vec4 spot(Flashlight FL, vec4 lightPos, vec4 lightDir, vec4 DT, vec4 ST, vec4 norm, float mShiny)
-//{
-//    float theta = dot(lightDir, normalize(-lightDir));
-//
-//
-//    return vec4(0);
-//}
+vec4 torch(vec4 res, float cutoff, float outerCutoff, vec4 lightDir, vec4 fragDir)
+{
+    float theta = dot(fragDir, -lightDir);
+
+    float epsilon   = cutoff - outerCutoff;
+    float intensity = clamp((theta - outerCutoff) / epsilon, 0.0, 1.0); 
+
+    if(theta > cutoff) 
+    {       
+        return res;
+    }
+    else
+        return vec4(0);
+}
+
 
 void main(void) {
 	//Powierzchnia
@@ -103,10 +111,14 @@ void main(void) {
     //Swiatlo
     vec4 result = vec4(0);
 
-    for (int i = 0; i < NR_POINT_LIGHTS; i++)
-        result += point(pointLights[i], iL[i], diffTex, specTex, normal, mShiny);
+    for (int i = 0; i < noPointLights - 1; i++)
+        result += point(pointLights[i], normal, iL[i], diffTex, specTex,  mShiny);
 
-    result += CalcDirLight(dirLight, iN, viewDir, diffTex, specTex, mShiny);
+    result += CalcDirLight(dirLight, normal, viewDir, diffTex, specTex, mShiny);
+
+    vec4 flashlight = point(pointLights[noPointLights - 1], normal, iL[noPointLights - 1], diffTex, specTex,  mShiny);
+
+    result = torch(flashlight, cutoff, 0, viewDir, camFront);
 
 	pixelColor = vec4(diffTex.rgb * result.rgb, diffTex.a);
 }

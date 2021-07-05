@@ -1,5 +1,18 @@
 #version 330
 
+struct PointLight {    
+    vec4 pos;
+    
+    vec4 lightColor;
+
+    float constant;
+    float linear;
+    float quadratic;  
+};  
+
+#define noPointLights 5
+uniform PointLight pointLights[noPointLights];
+
 //Zmienne jednorodne
 uniform mat4 P;
 uniform mat4 V;
@@ -15,24 +28,18 @@ uniform vec3 playerPos; //pozycja gracza
 
 //Zmienne interpolowane
 out vec4 iN;
-out vec4 iL[3];  
+out vec4 iL[noPointLights];  
 out vec4 iV; //wektor do obserwatora
 out vec2 itexCoord;
 
-#define NR_POINT_LIGHTS 3  
-
 void main(void) {
     // pozycje swiatel
-    vec4 lp[NR_POINT_LIGHTS] = vec4[NR_POINT_LIGHTS]( 
-    vec4(4.3, 2, -0.8, 1), 
-    vec4(19.3, 3, -0.8, 1), 
-    vec4(10, 1.5, -50, 1) 
-    );
-
-    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+    for (int i = 0; i < noPointLights - 1; i++)
     {
-        iL[i] = V * lp[i] - V * M * vertex;
+        iL[i] = V * pointLights[i].pos - V * M * vertex;
     }
+
+    iL[noPointLights - 1] = V * vec4(playerPos, 1) - V * M * vertex;
 
     itexCoord = texCoord;
 

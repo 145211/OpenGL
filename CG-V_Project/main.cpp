@@ -59,7 +59,21 @@ vector<Entity*> entities;
 vector<Collisions> objs;
 
 float ambientPwr = 0.025;
-float pwr = 0.25;
+float pwr = 0.05;
+
+vec3 attenuation = vec3(1.0, 0.14, 0.07);
+
+#define noPointLights 5
+
+vec4 lp[noPointLights] = {
+	vec4(4.3, 2, -0.8, 1),
+	vec4(19.3, 2, -0.8, 1),
+
+	vec4(18.5, 2, 24.25, 1),
+	vec4(4.5, 2, 24.25, 1),
+
+	vec4(playerPos, 1)
+};
 
 std::vector<std::string> skyboxFaces{
 	"textures\\skybox\\right.png",
@@ -168,7 +182,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Obliczanie kolizji z obiektami
-	//moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
+	moveVec.xz = Collide(playerPos.xz, moveVec.xz, objs);
 	playerPos += moveVec;
 
 	glm::mat4 V = glm::lookAt(
@@ -178,6 +192,10 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
+	sp->setVec4f(vec4(cameraFront, 1.0), "camFront");
+	sp->set1f(glm::cos(glm::radians(12.5f)), "cutoff");
+	//sp->set1f(ambientPwr, "outerCutoff");
+
 
 	sp->set1f(ambientPwr, "dirLight.ambientPwr");
 	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), "dirLight.ambientColor");
@@ -185,15 +203,17 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	sp->setVec4f(vec4(0.5, 0.5, 0.85, 1.0), "dirLight.lightColor");
 	sp->setVec4f(vec4(-0.1, -1.0, -0.1, 1.0), "dirLight.direction");
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < noPointLights; i++)
 	{
-		("pointLights[" + std::to_string(i) + ".lightColor").c_str();
+		sp->setVec4f(lp[i], ("pointLights[" + std::to_string(i) + "].pos").c_str());
 
 		sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), ("pointLights[" + std::to_string(i) + "].lightColor").c_str());
-		sp->set1f(1, ("pointLights[" + std::to_string(i) + "].constant").c_str());
-		sp->set1f(0.09, ("pointLights[" + std::to_string(i) + "].linear").c_str());
-		sp->set1f(0.032, ("pointLights[" + std::to_string(i) + "].quadratic").c_str());
+		sp->set1f(attenuation[0], ("pointLights[" + std::to_string(i) + "].constant").c_str());
+		sp->set1f(attenuation[1], ("pointLights[" + std::to_string(i) + "].linear").c_str());
+		sp->set1f(attenuation[2], ("pointLights[" + std::to_string(i) + "].quadratic").c_str());
 	}
+
+	sp->setVec4f(vec4(0, 1, 0, 1.0), ("pointLights[" + std::to_string(noPointLights - 1) + "].lightColor").c_str());
 
 	glDepthMask(GL_FALSE);
 	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)), Entity::drawType::NORMAL);
@@ -348,7 +368,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 	}
 
 	freeOpenGLProgram(window);
