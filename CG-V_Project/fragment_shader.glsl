@@ -58,7 +58,7 @@ vec4 CalcDirLight(DirLight light, vec4 norm, vec4 viewDir, vec4 DT, vec4 ST, flo
     return (ambient + diffuse);
 }  
 
-vec4 point(PointLight PL, vec4 norm, vec4 il, vec4 DT, vec4 ST, float mShiny)
+vec4 point(PointLight PL, vec4 norm, vec4 view, vec4 il, vec4 DT, vec4 ST, float mShiny)
 {
 	//Attenuation
 	float dist = length(il);
@@ -66,7 +66,7 @@ vec4 point(PointLight PL, vec4 norm, vec4 il, vec4 DT, vec4 ST, float mShiny)
 
 	//Rodzaje swiatla
 	vec4 mDiffuse = atten * vec4(0.5) * DT;
-	vec4 mSpecular = atten * vec4(0.5) * ST;
+	vec4 mSpecular = atten * vec4(0.25) * (1 - ST);
            
 	//diffuse
 	vec4 lp = normalize(il);
@@ -74,12 +74,11 @@ vec4 point(PointLight PL, vec4 norm, vec4 il, vec4 DT, vec4 ST, float mShiny)
 	vec4 diffuse = (diff * mDiffuse);
     
 	//Specular
-    vec4 viewDir = normalize(iV);
     vec4 reflectDir = reflect(-lp, norm);
-	float spec = pow(clamp(dot(reflectDir, viewDir), 0.5, 1), mShiny);
+	float spec = pow(clamp(dot(reflectDir, view), 0.5, 1), mShiny);
 	vec4 specular = (spec * mSpecular);
 
-    return PL.lightColor * (diffuse + specular);
+    return PL.lightColor * (specular + diffuse);
 }
 
 vec4 torch(vec4 res, float cutoff, float outerCutoff, vec4 lightDir, vec4 fragDir)
@@ -102,7 +101,7 @@ void main(void) {
 	//Powierzchnia
 	vec4 diffTex = texture(textureMap0, itexCoord);
 	vec4 specTex = texture(textureMap1, itexCoord);
-    float mShiny = 25;
+    float mShiny = 100;
 
     //kierunek patrzenia
     vec4 viewDir = normalize(iV);
@@ -112,13 +111,13 @@ void main(void) {
     vec4 result = vec4(0);
 
     for (int i = 0; i < noPointLights - 1; i++)
-        result += point(pointLights[i], normal, iL[i], diffTex, specTex,  mShiny);
+        result += point(pointLights[i], normal, viewDir, iL[i], diffTex, specTex,  mShiny);
 
     result += CalcDirLight(dirLight, normal, viewDir, diffTex, specTex, mShiny);
 
-    vec4 flashlight = point(pointLights[noPointLights - 1], normal, iL[noPointLights - 1], diffTex, specTex,  mShiny);
+    vec4 flashlight = point(pointLights[noPointLights - 1], normal, viewDir, iL[noPointLights - 1], diffTex, specTex,  mShiny);
 
-    result = torch(flashlight, cutoff, 0, viewDir, camFront);
+    //result = torch(flashlight, cutoff, 0, viewDir, camFront);
 
 	pixelColor = vec4(diffTex.rgb * result.rgb, diffTex.a);
 }
