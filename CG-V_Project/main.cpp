@@ -192,7 +192,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
-	sp->setVec4f(vec4(cameraFront, 1.0), "camFront");
+	sp->setVec4f(vec4(cameraFront, 0.0), "camFront");
 	sp->set1f(glm::cos(glm::radians(12.5f)), "cutoff");
 	//sp->set1f(ambientPwr, "outerCutoff");
 
@@ -385,6 +385,7 @@ int main(void)
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		printf("%f, %f, %f\n", cameraFront.x, cameraFront.y, cameraFront.z);
 	}
 
 	freeOpenGLProgram(window);

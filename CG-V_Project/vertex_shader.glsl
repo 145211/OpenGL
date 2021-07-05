@@ -31,6 +31,9 @@ out vec4 iN;
 out vec4 iL[noPointLights];  
 out vec4 iV; //wektor do obserwatora
 out vec2 itexCoord;
+out vec4 camera;
+
+uniform vec4 camFront;
 
 void main(void) {
     // pozycje swiatel
@@ -40,6 +43,8 @@ void main(void) {
     }
 
     iL[noPointLights - 1] = V * vec4(playerPos, 1) - V * M * vertex;
+
+    camera = V * camFront;
 
     itexCoord = texCoord;
 
