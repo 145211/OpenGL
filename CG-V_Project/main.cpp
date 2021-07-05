@@ -59,8 +59,7 @@ vector<Entity*> entities;
 vector<Collisions> objs;
 
 float ambientPwr = 0.025;
-vec3 lightColor = vec3(1, 0.95, 0.95);
-vec4 ambientLight = vec4(lightColor * ambientPwr, 1);
+float pwr = 0.25;
 
 std::vector<std::string> skyboxFaces{
 	"textures\\skybox\\right.png",
@@ -151,9 +150,6 @@ void initOpenGLProgram(GLFWwindow* window) {
 	skyboxsp = new ShaderProgram("skybox_vertex_shader.glsl", NULL, "skybox_fragment_shader.glsl");
 	terrainsp = new ShaderProgram("grass_vertex_shader.glsl", NULL, "grass_fragment_shader.glsl");
 
-	sp->use();
-	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
-
 	objs = collisionInit(objs);
 
 	glEnable(GL_BLEND);
@@ -182,17 +178,22 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 
 	glm::mat4 P = glm::perspective(50.0f * PI / 180.0f, aspectRatio, 0.01f, 100.0f); //Wylicz macierz rzutowania
 
-	glUniform4f(sp->u("ambientLight"), ambientLight.r, ambientLight.g, ambientLight.b, ambientLight.a);
 
-	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0f), "pointLights[0].lightColor");
-	sp->set1f(1, "pointLights[0].constant");
-	sp->set1f(0.09, "pointLights[0].linear");
-	sp->set1f(0.032, "pointLights[0].quadratic");
+	sp->set1f(ambientPwr, "dirLight.ambientPwr");
+	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), "dirLight.ambientColor");
+	sp->set1f(pwr, "dirLight.pwr");
+	sp->setVec4f(vec4(0.5, 0.5, 0.85, 1.0), "dirLight.lightColor");
+	sp->setVec4f(vec4(-0.1, -1.0, -0.1, 1.0), "dirLight.direction");
 
-	sp->setVec4f(vec4(1, 0.95, 0.95, 1.0f), "pointLights[1].lightColor");
-	sp->set1f(1, "pointLights[1].constant");
-	sp->set1f(0.09, "pointLights[1].linear");
-	sp->set1f(0.032, "pointLights[1].quadratic");
+	for (int i = 0; i < 3; i++)
+	{
+		("pointLights[" + std::to_string(i) + ".lightColor").c_str();
+
+		sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), ("pointLights[" + std::to_string(i) + "].lightColor").c_str());
+		sp->set1f(1, ("pointLights[" + std::to_string(i) + "].constant").c_str());
+		sp->set1f(0.09, ("pointLights[" + std::to_string(i) + "].linear").c_str());
+		sp->set1f(0.032, ("pointLights[" + std::to_string(i) + "].quadratic").c_str());
+	}
 
 	glDepthMask(GL_FALSE);
 	(*entities[0]).drawEntity(P, glm::mat4(glm::mat3(V)), Entity::drawType::NORMAL);
