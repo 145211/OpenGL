@@ -79,19 +79,19 @@ GLuint ShaderProgram::loadShader(GLenum shaderType,const char* fileName) {
 
 ShaderProgram::ShaderProgram(const char* vertexShaderFile,const char* geometryShaderFile,const char* fragmentShaderFile) {
 	//Wczytaj vertex shader
-	printf("Loading vertex shader...\n");
+	//printf("Loading vertex shader...\n");
 	vertexShader=loadShader(GL_VERTEX_SHADER,vertexShaderFile);
 
 	//Wczytaj geometry shader
 	if (geometryShaderFile!=NULL) {
-		printf("Loading geometry shader...\n");
+		//printf("Loading geometry shader...\n");
 		geometryShader=loadShader(GL_GEOMETRY_SHADER,geometryShaderFile);
 	} else {
 		geometryShader=0;
 	}
 
 	//Wczytaj fragment shader
-	printf("Loading fragment shader...\n");
+	//printf("Loading fragment shader...\n");
 	fragmentShader=loadShader(GL_FRAGMENT_SHADER,fragmentShaderFile);
 
 	//Wygeneruj uchwyt programu cieniującego
@@ -118,7 +118,7 @@ ShaderProgram::ShaderProgram(const char* vertexShaderFile,const char* geometrySh
 		delete []infoLog;
 	}
 
-	printf("Shader program created \n");
+	//printf("Shader program created \n");
 }
 
 ShaderProgram::~ShaderProgram() {
