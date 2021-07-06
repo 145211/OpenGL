@@ -267,6 +267,7 @@ void floorLevel(){
 	}
 	else
 	{
+	// alternative
 	/*if (playerPos.x > -4.5 && playerPos.x <= 27.2 && playerPos.z > -4.5 && playerPos.z <= 53.35) {
 		float ramp_x = 0, ramp_z = 0;
 		// wsp Z
