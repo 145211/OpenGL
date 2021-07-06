@@ -36,7 +36,7 @@ float sprint = 0.14f;
 float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
-float torch = glm::cos(glm::radians(15.0f));
+float torch = glm::cos(glm::radians(18.0f));
 
 glm::vec4 pressedKeys = glm::vec4(0,0,0,0);
 
@@ -101,7 +101,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		if (key == GLFW_KEY_R) playerPos = startPos;
 		if (key == GLFW_KEY_LEFT_SHIFT) movementSpeed += sprint;
 		if (key == GLFW_KEY_T)
-				torch = torch != 1 ? 1 : glm::cos(glm::radians(15.0f));
+				torch = torch != 1 ? 1 : glm::cos(glm::radians(18.0f));
 	}
 	if (action == GLFW_RELEASE) {
 		if (key == GLFW_KEY_A) pressedKeys[0] = 0;
@@ -211,7 +211,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	{
 		sp->setVec4f(lp[i], ("pointLights[" + std::to_string(i) + "].pos").c_str());
 
-		sp->setVec4f(vec4(1, 0.95, 0.95, 1.0), ("pointLights[" + std::to_string(i) + "].lightColor").c_str());
+		sp->setVec4f(vec4(1, 0.90, 0.90, 1.0), ("pointLights[" + std::to_string(i) + "].lightColor").c_str());
 		sp->set1f(attenuation[0], ("pointLights[" + std::to_string(i) + "].constant").c_str());
 		sp->set1f(attenuation[1], ("pointLights[" + std::to_string(i) + "].linear").c_str());
 		sp->set1f(attenuation[2], ("pointLights[" + std::to_string(i) + "].quadratic").c_str());
@@ -228,7 +228,7 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glDepthMask(GL_TRUE);
 
 	(*entities[1]).drawEntity(P, V, Entity::drawType::NORMAL); // Świątynia
-	(*entities[2]).drawEntity(P, V, Entity::drawType::NORMAL); // Test
+	//(*entities[2]).drawEntity(P, V, Entity::drawType::NORMAL); // Test
 	(*entities[3]).drawEntity(P, V, Entity::drawType::NORMAL); // Venus
 	(*entities[4]).drawEntity(P, V, Entity::drawType::NORMAL); // Donut
 	(*entities[4]).accessModel().rotate(glm::vec3(glm::radians(0.5), glm::radians(1.0), glm::radians(0.25)));
@@ -248,10 +248,29 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 }
 
 void floorLevel(){	
-	if (playerPos.z > -2.5)
-		playerPos.y = 3;
-	else if (playerPos.z > -4.5)
-		playerPos.y = 2.f + ((playerPos.z + 4.5f)/2.f);
+	if (playerPos.x > -4.5 && playerPos.x <= 27.2 && playerPos.z > -4.5 && playerPos.z <= 53.35) {
+		float ramp_x = 0, ramp_z = 0;
+		// wsp Z
+		if (playerPos.z > 49.35 && playerPos.z < 53.35) {
+			ramp_z += -((playerPos.z - 53.35) / 4.f);
+		}
+		else if (playerPos.z > -4.5 && playerPos.z <= -2.5) {
+			ramp_z += ((playerPos.z + 4.5f) / 2.f);
+		}
+		// wsp X
+		if (playerPos.x > 25.2 && playerPos.x < 27.2) {
+			ramp_x += -((playerPos.x - 27.2) / 2.f);
+		}
+		else if (playerPos.x > -4.5 && playerPos.x <= -2.5) {
+			ramp_x += ((playerPos.x + 4.5f) / 2.f);
+		}
+
+		else if (playerPos.x > -2.5 && playerPos.x <= 49.35 && playerPos.z > -2.5 && playerPos.z <= 49.35)
+			playerPos.y = 3;
+
+		if (ramp_z != 0 && ramp_x != 0) playerPos.y = 2.f + (ramp_z > ramp_x ? ramp_x : ramp_z);
+		else if (ramp_z != 0 || ramp_x != 0) playerPos.y = 2.f + ramp_x + ramp_z;
+	}
 	else 
 		playerPos.y = 2;
 }
@@ -392,7 +411,7 @@ int main(void)
 		floorLevel();
 
 		//print player position
-		printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
+		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
 		//printf("%f, %f, %f\n", cameraFront.x, cameraFront.y, cameraFront.z);
 	}
 

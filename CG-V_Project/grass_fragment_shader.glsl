@@ -18,7 +18,7 @@ void main(void) {
 	vec4 mn = normalize(n);
 
 	//Lighting model computation
-	float nl = clamp(dot(mn, ml), 0, 1);
+	float nl = clamp(dot(mn, 0.6*ml), 0, 1);
 
 	vec4 grassCol = texture(textureMap0, iTexCoord);
 	vec4 grass = texture(textureMap1, iTexCoord);

@@ -109,6 +109,12 @@ vector<Collisions> square(vec2 pos, float side, vector<Collisions> objs) {
 	return objs;
 };
 
+vector<Collisions> wall(vec2 A, vec2 B, vector<Collisions> objs) {
+	objs.push_back(Collisions(A, B, A, B));
+
+	return objs;
+};
+
 Collisions diagonal(vec2 A, vec2 B, vec2 C) {
 	return Collisions(A, B, C, (A + C) - B);
 }
@@ -139,6 +145,13 @@ vector<Collisions> collisionInit(vector<Collisions> objs) {
 	//vase
 	objs = square(vec2(4.3, 19.5), 2, objs);
 	objs = square(vec2(19.2, 19.5), 2, objs);
+
+	// border
+	objs = wall(vec2(44, -69), vec2(44, 69), objs); // L
+	objs = wall(vec2(-44, 69), vec2(-44, -69), objs); // R
+	objs = wall(vec2(45, 68), vec2(-45, 68), objs); // T
+	objs = wall(vec2(45, -68), vec2(-45, -68), objs); // D
+
 
 	return objs;
 };
