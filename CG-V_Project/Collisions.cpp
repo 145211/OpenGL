@@ -147,12 +147,16 @@ vector<Collisions> collisionInit(vector<Collisions> objs) {
 	objs = square(vec2(19.2, 19.5), 2, objs);
 
 	// border
-	objs = wall(vec2(44, -69), vec2(44, 69), objs); // L
-	objs = wall(vec2(-44, 69), vec2(-44, -69), objs); // R
-	objs = wall(vec2(45, 68), vec2(-45, 68), objs); // T
-	objs = wall(vec2(45, -68), vec2(-45, -68), objs); // D
+	//objs = wall(vec2(44, -69), vec2(44, 69), objs); // L
+	//objs = wall(vec2(-44, 69), vec2(-44, -69), objs); // R
+	//objs = wall(vec2(45, 68), vec2(-45, 68), objs); // T
+	//objs = wall(vec2(45, -68), vec2(-45, -68), objs); // D
 
 
+	//fence
+	objs.push_back(Collisions(vec2(7.75, -43.5), vec2(6.25, -43.5), vec2(6.25, -5.2), vec2(7.75, -5.2)));
+	objs.push_back(Collisions(vec2(16, -5.2), vec2(14.5, -5.2), vec2(14.5, -43.5), vec2(16, -43.5)));
+	
 	return objs;
 };
 

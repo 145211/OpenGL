@@ -31,8 +31,8 @@
 #include "myCube.h"
 
 float aspectRatio = 16.f/9.f;
-float movementSpeed = 0.08f;
-float sprint = 0.14f;
+float movementSpeed = 0.06f;
+float sprint = 0.12f;
 float sensitivity = 0.1f;
 double cursorxpos = 0, cursorypos = 0;
 bool firstMouse = true;
@@ -60,7 +60,7 @@ vector<Entity*> entities;
 vector<Collisions> objs;
 
 float ambientPwr = 0.025;
-float pwr = 0.05;
+float pwr = 0.1;
 
 vec3 attenuation = vec3(1.0, 0.14, 0.07);
 
@@ -73,7 +73,7 @@ vec4 lp[noPointLights] = {
 	vec4(18.5, 2, 24.25, 1),
 	vec4(4.5, 2, 24.25, 1),
 
-	vec4(11.15, 0.25, -52.9, 1),
+	vec4(11.15, 0.25, -52, 1),
 
 	vec4(playerPos, 1)
 };
@@ -247,8 +247,27 @@ void drawScene(GLFWwindow* window, float angle_x, float angle_y, glm::vec3& play
 	glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
 
+Collisions mainFloor(vec2(-2.5, -2.5), vec2(-2.5, 49.5), vec2(25.5, 49.5), vec2(25.5, -2.5));
+Collisions stairs(vec2(-4.5, -6.5), vec2(-4.5, 53.5), vec2(27.5, 53.5), vec2(27.5, -6.5));
+vector<vec2> sB{ stairs.A, stairs.B, stairs.C, stairs.D, stairs.A };
+vector<float> dists = {0, 0, 0, 0};
+
 void floorLevel(){	
-	if (playerPos.x > -4.5 && playerPos.x <= 27.2 && playerPos.z > -4.5 && playerPos.z <= 53.35) {
+	if (mainFloor.inRect(playerPos.xz))
+	{
+		playerPos.y = 4;
+	}
+	else if (stairs.inRect(playerPos.xz))
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			dists[i] = length(cross(vec3(sB[i + 1] - sB[i], 0), vec3(playerPos.xz - sB[i], 0)));
+		}
+		playerPos.y = 2 + 2 * glm::smoothstep(0.0f, 100.0f, *(std::min_element(dists.begin(), dists.end())));
+	}
+	else
+	{
+	/*if (playerPos.x > -4.5 && playerPos.x <= 27.2 && playerPos.z > -4.5 && playerPos.z <= 53.35) {
 		float ramp_x = 0, ramp_z = 0;
 		// wsp Z
 		if (playerPos.z > 49.35 && playerPos.z < 53.35) {
@@ -271,8 +290,9 @@ void floorLevel(){
 		if (ramp_z != 0 && ramp_x != 0) playerPos.y = 2.f + (ramp_z > ramp_x ? ramp_x : ramp_z);
 		else if (ramp_z != 0 || ramp_x != 0) playerPos.y = 2.f + ramp_x + ramp_z;
 	}
-	else 
+	else*/ 
 		playerPos.y = 2;
+	}
 }
 
 void movementKeys()
@@ -335,6 +355,7 @@ int main(void)
 	Texture* spec2 = new Texture("textures\\Metal\\SPEC.png", GL_TEXTURE_2D, 1);
 
 	Texture* VenusT = new Texture("Venus_de_Milo.png", GL_TEXTURE_2D, 0);
+
 	Texture* terrainT = new Texture("textures\\grass.png", GL_TEXTURE_2D, 0);
 
 	Texture* randomMap = new Texture("random_map.png", GL_TEXTURE_2D, 1);
@@ -354,13 +375,14 @@ int main(void)
 
 	Model model1;
 	model1.assimpLoadModel("Monument_test.obj");
-	Entity ent1(tex1, spec1, model1, sp);
-	ent1.accessModel().setPosition(glm::vec3(0, 1, -10));
+	Entity ent1(tex2, spec2, model1, sp);
+	ent1.accessModel().setPosition(glm::vec3(11.85, 1, 35));
+	ent1.accessModel().setScaling(glm::vec3(1.5, 1.5, 1.5));
 	entities.push_back(&ent1);
 	
 	Model model2;
 	model2.assimpLoadModel("Venus_de_Milo.obj");
-	Entity ent2(VenusT, spec1, model2, sp);
+	Entity ent2(VenusT, VenusT, model2, sp);
 	ent2.accessModel().setPosition(glm::vec3(11.85, 1, 24.25));
 	ent2.accessModel().setScaling(glm::vec3(1.3, 1.3, 1.3));
 	ent2.accessModel().setRotation(glm::vec3(0, glm::radians(180.0), 0));
@@ -371,7 +393,7 @@ int main(void)
 	Entity donut(tex1, spec1, donutM, sp);
 	donut.accessModel().setScaling(glm::vec3(30, 30, 30));
 	donut.accessModel().setRotation(glm::vec3(glm::radians(90.0), 0, 0));
-	donut.accessModel().setPosition(glm::vec3(11.15, 2, -53));
+	donut.accessModel().setPosition(glm::vec3(11.15, 2, -53.5));
 	entities.push_back(&donut);
 
 	Model terrainM;
@@ -412,7 +434,6 @@ int main(void)
 
 		//print player position
 		//printf("%f, %f, %f\n", playerPos.x, playerPos.y, playerPos.z);
-		//printf("%f, %f, %f\n", cameraFront.x, cameraFront.y, cameraFront.z);
 	}
 
 	freeOpenGLProgram(window);
