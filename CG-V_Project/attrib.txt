@@ -1,0 +1,9 @@
+Models downloaded form internet:
+Temple model: https://www.turbosquid.com/3d-models/free-max-mode-temple-greek/673675
+Vase: https://www.cgtrader.com/free-3d-models/architectural/decoration/greek-vase-3c42ab16-3193-406e-ad19-1939ecc25206
+Venus: https://www.turbosquid.com/3d-models/venus-de-milo-3d-model-1717594
+
+Textures downloaded from the internet:
+Grass: https://www.deviantart.com/frozenstocks/art/UNRESTRICTED-Grass-Texture-145307814
+Marble: https://3dtextures.me/2017/03/31/red-marble-002/
+Skybox: https://freepngimg.com/png/82984-skybox-blue-atmosphere-sky-space-hd-image-free-png
